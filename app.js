@@ -14,18 +14,7 @@ const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
 
-app.get('/api/', function (req, res) {
-	res.status(300).json({
-		status: 300,
-		message: "Bad Request"
-	});
-});
-
-app.get('/api/verify', function (req, res) {
-	res.status(300).json({ status: 300, message: "Bad Request" });
-});
-
-app.post('/api/verify', function (req, res) {
+app.post('/api/messages', function (req, res) {
 	const number = Number(req.body.data.phone.number);
 	const region = Number(req.body.data.phone.region);
 
