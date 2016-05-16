@@ -1,0 +1,32 @@
+{
+  "name": "twilio-microservice",
+  "version": "0.1.0",
+  "description": "email verification microservice",
+  "main": "server.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Michell Ayala <michell@mexbt.com>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "1.15.1",
+    "express": "4.13.4"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "mocha": "2.4.5",
+    "supertest": "1.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mishelashala/twilio-microservice.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mishelashala/twilio-microservice/issues"
+  },
+  "homepage": "https://github.com/mishelashala/twilio-microservice#readme"
+}
