@@ -1,5 +1,5 @@
 # API Contract
-Route: `herokuapp.com/api/`
+Route: `twilio-email-verification.herokuapp.com/api/`
 
 ## POST /api/verify
 It creates a new verification message.

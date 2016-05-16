@@ -1,5 +1,5 @@
 {
-  "name": "twilio-microservice",
+  "name": "twilio-email-verification",
   "version": "0.1.0",
   "description": "email verification microservice",
   "main": "server.js",
