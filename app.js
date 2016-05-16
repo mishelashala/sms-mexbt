@@ -19,7 +19,7 @@ app.post('/api/messages', function (req, res) {
 	const region = Number(req.body.data.phone.region);
 
 	// we need to save the confirmation code into a database
-	const code = cuid();
+	const verify_code = cuid();
 
 	if (number == NaN || region == NaN) {
 		return res.status(300).json({ status: 300, message: "Bad Request" });
@@ -28,15 +28,15 @@ app.post('/api/messages', function (req, res) {
 	client.messages.create({
 		to: `${region}${number}`,
 		from: keys.phone_number,
-		message: code
+		body: verify_code
 	}, function (err, message) {
 		if (err) {
-			return res.status(500).json({ status: 500, message: "Internal error" });
+			return res.status(500).json({ status: 500, message: err.message });
 		}
 
 		const res_message = req.body.data;
 		res_message.message = {
-			status: send,
+			status: message.status,
 			sid: message.sid
 		};
 
