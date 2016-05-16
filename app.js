@@ -44,5 +44,9 @@ app.post('/api/messages', function (req, res) {
 	});
 });
 
+app.use(function (req, res) {
+	res.status(300).json({ status: 300, message: "Bad Request" });
+});
+
 module.exports = app;
 
