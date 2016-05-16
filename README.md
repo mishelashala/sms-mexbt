@@ -2,8 +2,8 @@
 
 ## Instalation
 ```
-$ git clone git@github.com:mishelashala/twilio-microservice.git
-$ cd twilio-microservice
+$ git clone git@bitbucket.org:mishelashala/twilio-email-verification.git
+$ cd twilio-email-verification
 $ npm install
 $ node bin/www
 ```
