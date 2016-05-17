@@ -10,6 +10,7 @@ const app = Express();
 
 const keys = require('./keys');
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
+//const Email = require('./db').models.email;
 
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
@@ -19,28 +20,40 @@ app.post('/api/messages', function (req, res) {
 	const region = Number(req.body.data.phone.region);
 
 	// we need to save the confirmation code into a database
-	const verify_code = cuid();
+	const verification_code = cuid();
 
 	if (number == NaN || region == NaN) {
 		return res.status(300).json({ status: 300, message: "Bad Request" });
-	} 
+	}
+
+	//const email = new Email({
+	//	code: verification_code,
+	//	email: req.body.data.user.email,
+	//	session_id: req.body.data.user.session_id
+	//});
 
 	client.messages.create({
 		to: `${region}${number}`,
 		from: keys.phone_number,
-		body: verify_code
+		body: verification_code
 	}, function (err, message) {
 		if (err) {
 			return res.status(500).json({ status: 500, message: err.message });
 		}
 
-		const res_message = req.body.data;
-		res_message.message = {
-			status: message.status,
-			sid: message.sid
-		};
+		//email.save(function (err) {
+		//	if (err) {
+		//		return res.status(500).json({ status: 500, message: err.message })
+		//	}
 
-		res.status(201).json(res_message);
+			const res_message = req.body.data;
+			res_message.message = {
+				status: message.status,
+				sid: message.sid
+			};
+
+			res.status(201).json(res_message);
+		//});
 	});
 });
 

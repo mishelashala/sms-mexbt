@@ -48,3 +48,43 @@ Status: 201
 	}
 }
 ```
+
+## POST /api/verify
+
+### Request
+**Headers**:
+```
+Accept: application/json
+```
+
+**Body**:
+```
+{
+	"data": {
+		"user": {
+			"email": "starships@outlook.com",
+			"verification_code": "some-uuid"
+		}
+	}
+}
+```
+
+### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 200
+```
+
+```
+{
+	"data": {
+		"user": {
+			"email": "starships@outlook.com",
+			"verification_code": "some-uuid",
+			"status": "verified"
+		}
+	}
+}
+```
+
