@@ -15,7 +15,7 @@ const keys = require('./keys');
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 const Email = require('./db').models.email;
 
-Mongoose.connect('mongodb://localhost/mexbt-emails');
+Mongoose.connect(keys.mongo_uri);
 
 app.use(Logger('tiny'));
 app.use(BodyParser.json());
