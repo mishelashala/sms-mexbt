@@ -7,6 +7,7 @@
     "node": ">=4.0.0"
   },
   "scripts": {
+    "lint": "semistandard",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -23,6 +24,7 @@
   "devDependencies": {
     "chai": "3.5.0",
     "mocha": "2.4.5",
+    "semistandard": "8.0.0",
     "supertest": "1.2.0"
   },
   "repository": {

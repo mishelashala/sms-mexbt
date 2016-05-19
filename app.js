@@ -1,11 +1,9 @@
 'use strict';
 
-const Http = require('http');
 const Express = require('express');
 const BodyParser = require('body-parser');
 const Twilio = require('twilio');
 const cuid = require('cuid');
-const Fs = require('fs');
 const Logger = require('morgan');
 const Mongoose = require('mongoose');
 
@@ -22,45 +20,43 @@ app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
 
 app.post('/api/messages', function (req, res) {
-	const number = Number(req.body.data.phone.number);
-	const region = Number(req.body.data.phone.region);
+  const number = Number(req.body.data.phone.number);
+  const region = Number(req.body.data.phone.region);
 
-	const verification_code = cuid();
+  const verificationCode = cuid();
 
-	if (number == NaN || region == NaN) {
-		return res.status(300).json({ status: 300, message: "Bad Request" });
-	}
+  if (isNaN(number) || isNaN(region)) {
+    return res.status(300).json({ status: 300, message: 'Bad Request' });
+  }
 
-	client.messages.create({
-		to: `${region}${number}`,
-		from: keys.phone_number,
-		body: verification_code
-	}, function (err, message) {
-		if (err) {
-			return res.status(500).json({ status: 500, message: err.message });
-		}
-
-		const email = new Email({
-               		code: verification_code,
-               		email: req.body.data.user.email
-        	}).save(function (err) {
-			if (err) {
-				return res.status(500).json({ status: 500, message: err.message })
-			}
-
-			const res_message = req.body.data;
-			res_message.message = {
-				status: message.status,
-				sid: message.sid
-			};
-
-			res.status(201).json(res_message);
-		});
-	});
+  client.messages.create({
+    to: `${region}${number}`,
+    from: keys.phone_number,
+    body: verificationCode
+  }, function (err, message) {
+    if (err) {
+      return res.status(500).json({ status: 500, message: err.message });
+    }
+    const email = new Email({
+      code: verificationCode,
+      email: req.body.data.user.email
+    });
+    email.save(function (err) {
+      if (err) {
+        return res.status(500).json({ status: 500, message: err.message });
+      }
+      const resMessage = req.body.data; 
+      resMessage.message = {
+        status: message.status,
+        sid: message.sid
+      };
+      res.status(201).json(resMessage);
+    });
+  });
 });
 
 app.use(function (req, res) {
-	res.status(300).json({ status: 300, message: "Bad Request" });
+  res.status(300).json({ status: 300, message: 'Bad Request' });
 });
 
 module.exports = app;
