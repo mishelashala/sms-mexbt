@@ -1,3 +1,9 @@
 # modules and dependencies
 node_modules
 
+# code coverage (istanbul)
+coverage
+
+# auto-saved files (gedit, vim)
+~*
+*.swp
