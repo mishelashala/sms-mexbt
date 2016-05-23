@@ -2,22 +2,19 @@
 
 const Express = require('express');
 const BodyParser = require('body-parser');
-// const Dogapi = require('dogapi');
 const HttpStatus = require('http-status');
 
 const Utils = require('./utils');
 const messagesRoute = require('./routes/').messages;
+const verifyRoute = require('./routes/').verify;
 
 const app = Express();
-// const Email = require('./db/').models.email;
-
-// Mongoose.connect(keys.mongo_uri);
-// Dogapi.initialize(keys.datadog_config);
 
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
 
 app.use('/api/messages/', messagesRoute);
+app.use('/api/verify', verifyRoute);
 
 app.use((req, res) => {
   res
