@@ -45,9 +45,6 @@ describe('Test /api/message', () => {
           Expect(res.body.data.message).to.have.property('code')
             .and.to.be.a('string');
 
-          Expect(res.body.data.message).to.have.property('status')
-            .and.to.be.a('string');
-
           Expect(res.body.data.phone).to.have.property('region')
             .and.to.be.equal(data.phone.region);
 

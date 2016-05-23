@@ -1,8 +1,8 @@
 'use strict';
 
 const Mongoose = require('mongoose');
-const EmailSchema = require('../schemas/email');
+const UserSchema = require('../schemas/user');
 
-const EmailModel = Mongoose.model('users', EmailSchema);
+const UserModel = Mongoose.model('users', UserSchema);
 
-module.exports = EmailModel;
+module.exports = UserModel;

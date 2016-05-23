@@ -9,7 +9,7 @@ module.exports = function (body) {
       number: Number(body.data.phone.number)
     },
     message: {
-      code: Cuid()
+      code: Cuid().slice(0, 8)
     },
     user: {
       email: String(body.data.user.email)
