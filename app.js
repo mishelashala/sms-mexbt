@@ -2,7 +2,6 @@
 
 const Express = require('express');
 const BodyParser = require('body-parser');
-// const Mongoose = require('mongoose');
 // const Dogapi = require('dogapi');
 const HttpStatus = require('http-status');
 
