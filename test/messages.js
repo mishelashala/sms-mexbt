@@ -188,7 +188,7 @@ describe('Test /api/message', () => {
   });
 
   describe('GET', () => {
-    it('should send a 405 Method Not Allowed', (done) => {
+    it('should get a 405 Method Not Allowed', (done) => {
       Request(app)
         .get('/api/messages')
         .set('Accept', 'application/json')
@@ -214,37 +214,6 @@ describe('Test /api/message', () => {
 
           Expect(res.body.error).to.have.property('message')
             .and.to.be.equal('Method Not Allowed');
-
-          done();
-        });
-    });
-
-    it('should send the wrong Accept Header', (done) => {
-      Request(app)
-        .get('/api/messages')
-        .set('Accept', 'text/html')
-        .expect(HttpStatus.NOT_ACCEPTABLE, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-
-          Expect(res).to.have.property('headers')
-            .and.to.be.an('object');
-
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
-
-          Expect(res.headers).to.have.property('content-type')
-            .and.to.be.equal('application/json; charset=utf-8');
-
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.NOT_ACCEPTABLE);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Not Acceptable');
 
           done();
         });
@@ -282,37 +251,6 @@ describe('Test /api/message', () => {
           done();
         });
     });
-
-    it('should send the wrong Accept Header', (done) => {
-      Request(app)
-        .put('/api/messages')
-        .set('Accept', 'text/html')
-        .expect(HttpStatus.NOT_ACCEPTABLE, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-
-          Expect(res).to.have.property('headers')
-            .and.to.be.an('object');
-
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
-
-          Expect(res.headers).to.have.property('content-type')
-            .and.to.be.equal('application/json; charset=utf-8');
-
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.NOT_ACCEPTABLE);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Not Acceptable');
-
-          done();
-        });
-    });
   });
 
   describe('DELETE', () => {
@@ -342,37 +280,6 @@ describe('Test /api/message', () => {
 
           Expect(res.body.error).to.have.property('message')
             .and.to.be.equal('Method Not Allowed');
-
-          done();
-        });
-    });
-
-    it('should send the wrong Accept Header', (done) => {
-      Request(app)
-        .delete('/api/messages')
-        .set('Accept', 'text/html')
-        .expect(HttpStatus.NOT_ACCEPTABLE, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-
-          Expect(res).to.have.property('headers')
-            .and.to.be.an('object');
-
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
-
-          Expect(res.headers).to.have.property('content-type')
-            .and.to.be.equal('application/json; charset=utf-8');
-
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.NOT_ACCEPTABLE);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Not Acceptable');
 
           done();
         });

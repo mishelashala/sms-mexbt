@@ -85,46 +85,19 @@ Router
     });
   })
   .get('/', (req, res) => {
-    res.format({
-      'application/json' () {
-        res
-          .status(HttpStatus.METHOD_NOT_ALLOWED)
-          .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
-      },
-      default () {
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
-      }
-    });
+    res
+      .status(HttpStatus.METHOD_NOT_ALLOWED)
+      .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
   })
   .put('/', (req, res) => {
-    res.format({
-      'application/json' () {
-        res
-          .status(HttpStatus.METHOD_NOT_ALLOWED)
-          .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
-      },
-      default () {
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
-      }
-    });
+    res
+      .status(HttpStatus.METHOD_NOT_ALLOWED)
+      .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
   })
   .delete('/', (req, res) => {
-    res.format({
-      'application/json' () {
-        res
-          .status(HttpStatus.METHOD_NOT_ALLOWED)
-          .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
-      },
-      default () {
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
-      }
-    });
+    res
+      .status(HttpStatus.METHOD_NOT_ALLOWED)
+      .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
   });
 
 module.exports = Router;
