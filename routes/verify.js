@@ -11,7 +11,9 @@ Router
     res.format({
       'application/json' () {
         const data = req.body.data;
+
         if (!data.message.code || !data.user.email) {
+          console.log(`Bad request: ${data}`);
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
@@ -41,10 +43,7 @@ Router
               .status(HttpStatus.ACCEPTED)
               .json({ data: doc });
           })
-          .catch((err) => {
-            if (err) {
-              console.error(`Error: ${err.message}`);
-            }
+          .catch(() => {
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
               .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));

@@ -13,7 +13,8 @@ describe('Test /api/message', () => {
   });
 
   describe('POST', () => {
-    it('should create a new email verification code', (done) => {
+    it('should create a new email verification code', function (done) {
+      this.timeout(100000);
       const data = {
         phone: {
           region: 52,
@@ -288,56 +289,6 @@ describe('Test /api/message', () => {
 
           done();
         });
-    });
-  });
-
-  after(() => {
-    describe('POST', () => {
-      it('should try to send a verification msg to a verified user', (done) => {
-        setTimeout(() => {
-          const data = {
-            phone: {
-              region: 52,
-              number: process.env.TEST_PHONE_NUMBER
-            },
-            user: {
-              email: 'starships@outlook.com'
-            }
-          };
-
-          Request(app)
-            .post('/api/messages')
-            .send({ data })
-            .expect(HttpStatus.BAD_REQUEST, (err, res) => {
-              if (err) {
-                return done(err);
-              }
-
-              Expect(res).to.have.property('headers')
-                .and.to.be.an('object');
-
-              Expect(res).to.have.property('body')
-                .and.to.be.an('object');
-
-              Expect(res.headers).to.have.property('content-type')
-                .and.to.be.equal('application/json; charset=utf-8');
-
-              Expect(res.body).to.have.property('data')
-                .and.to.be.an('object');
-
-              Expect(res.body).to.have.property('error')
-                .and.to.be.an('object');
-
-              Expect(res.body.error).to.have.property('status')
-                .and.to.be.equal(HttpStatus.BAD_REQUEST);
-
-              Expect(res.body.error).to.have.propert('message')
-                .and.to.be.equal('Bad Request');
-
-              done();
-            });
-        }, 5000);
-      });
     });
   });
 });

@@ -49,22 +49,18 @@ Router
               }
 
               __user.message.code = data.message.code;
+              res.status(HttpStatus.CREATED).json({ data: __user });
 
               __user
                 .save()
-                .then((doc) => {
-                  res.status(HttpStatus.CREATED).json({ data: doc });
-                })
-                .catch((err) => {
-                  console.error(`Error: ${err.message}`);
+                .catch(() => {
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
                 });
             });
           })
-          .catch((err) => {
-            console.error(`Error: ${err.message}`);
+          .catch(() => {
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
               .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
