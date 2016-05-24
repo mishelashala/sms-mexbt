@@ -9,9 +9,19 @@ const app = require('../app');
 describe('Test /api/verify', () => {
   describe('POST', () => {
     it('should verify an email account', (done) => {
+      const data = {
+        user: {
+    			email: "starships@outlook.com"
+    		},
+        message: {
+          code: 'ciokl2a0'
+        }
+      };
+
       Request(app)
         .post('/api/verify')
-        .expect(HttpStatus.METHOD_NOT_ALLOWED, (err, res) => {
+        .send({ data })
+        .expect(HttpStatus.ACCEPTED, (err, res) => {
           if (err) {
             return done(err);
           }
@@ -24,6 +34,37 @@ describe('Test /api/verify', () => {
 
           Expect(res.headers).to.have.property('content-type')
             .and.to.be.equal('application/json; charset=utf-8');
+
+          done();
+        });
+    });
+
+    it('should send wrong Accept Header', (done) => {
+      Request(app)
+        .post('/api/verify')
+        .set('Accept', 'text/html')
+        .expect(HttpStatus.NOT_ACCEPTABLE, (err, res) => {
+          if (err) {
+            return done(err);
+          }
+
+          Expect(res).to.have.property('headers')
+            .and.to.be.an('object');
+
+          Expect(res).to.have.property('body')
+            .and.to.be.an('object');
+
+          Expect(res.headers).to.have.property('content-type')
+            .and.to.be.equal('application/json; charset=utf-8');
+
+          Expect(res.body).to.have.property('error')
+            .and.to.be.an('object');
+
+          Expect(res.body.error).to.have.property('status')
+            .and.to.be.equal(HttpStatus.NOT_ACCEPTABLE);
+
+          Expect(res.body.error).to.have.property('message')
+            .and.to.be.equal('Not Acceptable');
 
           done();
         });

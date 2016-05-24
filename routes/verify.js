@@ -11,22 +11,69 @@ const Router = Express.Router();
 
 Router
   .post('/', (req, res) => {
-    
+    res.format({
+      'application/json' () {
+        const data = req.body.data;
+
+        if (!data.message.code || !data.user.email) {
+          return res
+            .status(HttpStatus.BAD_REQUEST)
+            .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
+        }
+
+        User
+          .findOne({ user: { email: data.user.email }, message: { code: data.message.code }})
+          .exec()
+          .then((user) => {
+            if (!user) {
+              return res
+                .status(HttpStatus.BAD_REQUEST)
+                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
+            }
+
+            if (user.code !== data.code) {
+            }
+
+            const newData = {
+              verified: true
+            };
+
+            return User
+              .findOneAndUpdate({ user }, { $set: { newData }})
+              .exec();
+          })
+          .then((doc) => {
+            res
+              .status(HttpStatus.ACCEPTED)
+              .json(Utils.createStatusResponse(HttpStatus.ACCEPTED));
+          })
+          .catch((err) => {
+            res
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+          });
+      },
+      default () {
+        res
+          .status(HttpStatus.NOT_ACCEPTABLE)
+          .json(Utils.createStatusResponse(HttpStatus.NOT_ACCEPTABLE));
+      }
+    });
   })
   .get('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
+      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
   .put('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
+      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
   .delete('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
+      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   });
 
 module.exports = Router;

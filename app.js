@@ -3,12 +3,15 @@
 const Express = require('express');
 const BodyParser = require('body-parser');
 const HttpStatus = require('http-status');
+const Mongoose = require('mongoose');
 
 const Utils = require('./utils');
 const messagesRoute = require('./routes/').messages;
 const verifyRoute = require('./routes/').verify;
 
 const app = Express();
+
+Mongoose.connect('mongodb://localhost/mexbt-emails');
 
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));

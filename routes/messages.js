@@ -10,8 +10,6 @@ const User = require('../databases/').models.user;
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 
-Mongoose.connect('mongodb://localhost/mexbt-emails');
-
 Router
   .post('/', (req, res) => {
     res.format({
@@ -21,30 +19,26 @@ Router
         if (!Utils.validData(data)) {
           return res
             .status(HttpStatus.BAD_REQUEST)
-            .json(Utils.createError(HttpStatus.BAD_REQUEST));
+            .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
         }
 
         User
-          .findOne({ user: { email: data.user.email }}).exec()
+          .findOne({ user: { email: data.user.email }})
+          .exec()
           .then((user) => {
             if (!user) {
-              return new User({
-                phone: {
-                  number: data.phone.number,
-                  region: data.phone.region
-                },
-                user: {
-                  email: data.user.email
-                },
-                message: {
-                  code: data.message.code
-                }
-              });
+              return new User(data);
             };
 
             return user;
           })
           .then((__user) => {
+            if (__user.verified) {
+              return res
+                .status(HttpStatus.BAD_REQUEST)
+                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
+            }
+
             client.messages.create({
               to: `${data.phone.region}${data.phone.number}`,
               from: keys.phone_number,
@@ -53,78 +47,50 @@ Router
               if (err) {
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .json(Utils.createError(HttpStatus.INTERNAL_SERVER_ERROR));
+                  .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               }
 
-              const newData = { message: { code: data.message.code }};
-              const options = { upsert: true };
+              __user.message.code = data.message.code;
 
-              User
-                .findOneAndUpdate({ user: { email: __user.user.email }}, newData, options)
-                .exec()
-                .then((doc) => res.status(HttpStatus.CREATED).json({ data }))
+              __user
+                .save()
+                .then((doc) => {
+                  res.status(HttpStatus.CREATED).json({ data: doc });
+                })
                 .catch((err) => {
-                  console.log('something went wrong');
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json(Utils.createError(HttpStatus.INTERNAL_SERVER_ERROR));
+                    .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
                 });
             });
           })
           .catch((err) => {
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Utils.createError(HttpStatus.INTERNAL_SERVER_ERROR));
+              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
           });
       },
       default () {
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
+          .json(Utils.createStatusResponse(HttpStatus.NOT_ACCEPTABLE));
       }
     });
   })
   .get('/', (req, res) => {
-    res.format({
-      'application/json' () {
-        res
-          .status(HttpStatus.METHOD_NOT_ALLOWED)
-          .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
-      },
-      default () {
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
-      }
-    });
+    res
+      .status(HttpStatus.METHOD_NOT_ALLOWED)
+      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
   .put('/', (req, res) => {
-    res.format({
-      'application/json' () {
-        res
-          .status(HttpStatus.METHOD_NOT_ALLOWED)
-          .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
-      },
-      default () {
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
-      }
-    });
+    res
+      .status(HttpStatus.METHOD_NOT_ALLOWED)
+      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
   .delete('/', (req, res) => {
-    res.format({
-      'application/json' () {
-        res
-          .status(HttpStatus.METHOD_NOT_ALLOWED)
-          .json(Utils.createError(HttpStatus.METHOD_NOT_ALLOWED));
-      },
-      default () {
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createError(HttpStatus.NOT_ACCEPTABLE));
-      }
-    });
+    res
+      .status(HttpStatus.METHOD_NOT_ALLOWED)
+      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   });
 
 module.exports = Router;
