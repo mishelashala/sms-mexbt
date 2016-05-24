@@ -1,3 +1,7 @@
 language: node_js
 node_js:
   - "6"
+notifications:
+  slack:
+      rooms:
+        - mexbt:u8QhlyNEu1uSkT9a9SYOyE1b#devops
