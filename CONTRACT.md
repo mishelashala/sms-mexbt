@@ -28,15 +28,14 @@ Accept: application/json
 **Headers**:
 ```
 Content-Type: application/json
-Status: 201
+Status: 201 Created
 ```
 **Body**:
 ```
 {
 	"data": {
 		"message": {
-			"id": "some-uuid",
-			"status": "send"
+			"id": "some-uuid"
 		},
 		"phone": {
 			"region": 52,
