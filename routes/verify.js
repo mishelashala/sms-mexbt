@@ -37,7 +37,6 @@ Router
             return _user.save();
           })
           .then((doc) => {
-            console.log(doc);
             res
               .status(HttpStatus.ACCEPTED)
               .json({ data: doc });

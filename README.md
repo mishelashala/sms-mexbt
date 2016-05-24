@@ -1,7 +1,7 @@
 # Email verfication - Twilio microservice
 
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
-[code-ship](https://codeship.com/projects/154010/status?branch=master)
+![code-ship](https://codeship.com/projects/154010/status?branch=master)
 ## Instalation
 ```
 $ git clone git@bitbucket.org:mexbtcore/twilio-email-verification.git

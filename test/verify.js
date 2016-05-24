@@ -14,7 +14,7 @@ describe('Test /api/verify', () => {
           email: 'starships@outlook.com'
         },
         message: {
-          code: process.env.TEST_TELEPHONE_NUMBER
+          code: process.env.TEST_VERIFY_CODE
         }
       };
 
@@ -65,6 +65,47 @@ describe('Test /api/verify', () => {
 
           Expect(res.body.error).to.have.property('message')
             .and.to.be.equal('Not Acceptable');
+
+          done();
+        });
+    });
+
+    it('should send incomplete data', (done) => {
+      const data = {
+        user: {
+          email: 'starships@outlook.com'
+        },
+        message: {
+          code: ''
+        }
+      };
+
+      Request(app)
+        .post('/api/verify')
+        .set('Accept', 'application/json')
+        .send(({ data }))
+        .expect(HttpStatus.BAD_REQUEST, (err, res) => {
+          if (err) {
+            return done(err);
+          }
+
+          Expect(res).to.have.property('headers')
+            .and.to.be.an('object');
+
+          Expect(res).to.have.property('body')
+            .and.to.be.an('object');
+
+          Expect(res.headers).to.have.property('content-type')
+            .and.to.be.equal('application/json; charset=utf-8');
+
+          Expect(res.body).to.have.property('error')
+            .and.to.be.an('object');
+
+          Expect(res.body.error).to.have.property('status')
+            .and.to.be.equal(HttpStatus.BAD_REQUEST);
+
+          Expect(res.body.error).to.have.property('message')
+            .and.to.be.equal('Bad Request');
 
           done();
         });

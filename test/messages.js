@@ -3,16 +3,21 @@
 const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
+const User = require('../databases/').models.user;
 
 const app = require('../app');
 
 describe('Test /api/message', () => {
+  before(() => {
+    User.find({}).remove().exec();
+  });
+
   describe('POST', () => {
     it('should create a new email verification code', (done) => {
       const data = {
         phone: {
           region: 52,
-          number: 9621087445
+          number: process.env.TEST_PHONE_NUMBER
         },
         user: {
           email: 'starships@outlook.com'
@@ -49,7 +54,7 @@ describe('Test /api/message', () => {
             .and.to.be.equal(data.phone.region);
 
           Expect(res.body.data.phone).to.have.property('number')
-            .and.to.be.equal(data.phone.number);
+            .and.to.be.equal(Number(data.phone.number));
 
           Expect(res.body.data).to.have.property('user')
             .and.to.be.an('object');
@@ -283,6 +288,56 @@ describe('Test /api/message', () => {
 
           done();
         });
+    });
+  });
+
+  after(() => {
+    describe('POST', () => {
+      it('should try to send a verification msg to a verified user', () => {
+        setTimeout(() => {
+          const data = {
+            phone: {
+              region: 52,
+              number: process.env.TEST_PHONE_NUMBER
+            },
+            user: {
+              email: 'starships@outlook.com'
+            }
+          };
+
+          Request(app)
+            .post('/api/messages')
+            .send({ data })
+            .expect(HttpStatus.BAD_REQUEST, (err, res) => {
+              if (err) {
+                return done(err);
+              }
+
+              Expect(res).to.have.property('headers')
+                .and.to.be.an('object');
+
+              Expect(res).to.have.property('body')
+                .and.to.be.an('object');
+
+              Expect(res.headers).to.have.property('content-type')
+                .and.to.be.equal('application/json; charset=utf-8');
+
+              Expect(res.body).to.have.property('data')
+                .and.to.be.an('object');
+
+              Expect(res.body).to.have.property('error')
+                .and.to.be.an('object');
+
+              Expect(res.body.error).to.have.property('status')
+                .and.to.be.equal(HttpStatus.BAD_REQUEST);
+
+              Expect(res.body.error).to.have.propert('message')
+                .and.to.be.equal('Bad Request');
+
+              done();
+            });
+        }, 5000);
+      });
     });
   });
 });
