@@ -11,8 +11,8 @@ describe('Test /api/verify', () => {
     it('should verify an email account', (done) => {
       const data = {
         user: {
-    			email: "starships@outlook.com"
-    		},
+          email: 'starships@outlook.com'
+        },
         message: {
           code: process.env.TEST_TELEPHONE_NUMBER
         }
