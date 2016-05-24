@@ -62,8 +62,10 @@ Accept: application/json
 {
 	"data": {
 		"user": {
-			"email": "starships@outlook.com",
-			"verification_code": "some-uuid"
+			"email": "starships@outlook.com"
+		},
+		"message": {
+			"code": "some-uuid"
 		}
 	}
 }
@@ -80,11 +82,12 @@ Status: 200
 {
 	"data": {
 		"user": {
-			"email": "starships@outlook.com",
-			"verification_code": "some-uuid",
-			"status": "verified"
-		}
+			"email": "starships@outlook.com"
+		},
+		"message": {
+			"code": "some-uuid"
+		},
+		"verified": true
 	}
 }
 ```
-

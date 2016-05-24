@@ -8,61 +8,44 @@ const Utils = require('../utils');
 const User = require('../databases/').models.user;
 
 const Router = Express.Router();
-const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 
 Router
   .post('/', (req, res) => {
     res.format({
       'application/json' () {
-        const data = Utils.createVerificationData(req.body);
+        const data = req.body.data;
 
-        if (!Utils.validData(data)) {
+        if (!data.message.code || !data.user.email) {
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
         }
 
         User
-          .findOne({ user: { email: data.user.email }})
+          .findOne({ user: { email: data.user.email }, message: { code: data.message.code }})
           .exec()
           .then((user) => {
             if (!user) {
-              return new User(data);
-            };
-
-            return user;
-          })
-          .then((__user) => {
-            if (__user.verified) {
               return res
                 .status(HttpStatus.BAD_REQUEST)
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
-            client.messages.create({
-              to: `${data.phone.region}${data.phone.number}`,
-              from: keys.phone_number,
-              body: data.message.code
-            }, (err, msg) => {
-              if (err) {
-                return res
-                  .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
-              }
+            if (user.code !== data.code) {
+            }
 
-              __user.message.code = data.message.code;
+            const newData = {
+              verified: true
+            };
 
-              __user
-                .save()
-                .then((doc) => {
-                  res.status(HttpStatus.CREATED).json({ data: doc });
-                })
-                .catch((err) => {
-                  res
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
-                });
-            });
+            return User
+              .findOneAndUpdate({ user }, { $set: { newData }})
+              .exec();
+          })
+          .then((doc) => {
+            res
+              .status(HttpStatus.ACCEPTED)
+              .json(Utils.createStatusResponse(HttpStatus.ACCEPTED));
           })
           .catch((err) => {
             res
