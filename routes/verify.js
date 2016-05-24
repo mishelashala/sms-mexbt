@@ -13,7 +13,6 @@ Router
         const data = req.body.data;
 
         if (!data.message.code || !data.user.email) {
-          console.log(`Bad request: ${data}`);
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
