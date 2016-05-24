@@ -293,7 +293,7 @@ describe('Test /api/message', () => {
 
   after(() => {
     describe('POST', () => {
-      it('should try to send a verification msg to a verified user', () => {
+      it('should try to send a verification msg to a verified user', (done) => {
         setTimeout(() => {
           const data = {
             phone: {
