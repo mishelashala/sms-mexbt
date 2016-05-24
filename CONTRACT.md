@@ -14,11 +14,11 @@ Accept: application/json
 {
 	"data": {
 		"phone": {
-			"region": 52,
-			"number": 9621087445
+			"region": 01,
+			"number": 5555555555
 		},
 		"user": {
-			"email": "starships@outlook.com"
+			"email": "example@domain.com"
 		}
 	}
 }
@@ -34,15 +34,16 @@ Status: 201 Created
 ```
 {
 	"data": {
+		"verified": false,
 		"message": {
-			"id": "some-uuid"
+			"code": "abcdef" // len(6)
 		},
 		"phone": {
-			"region": 52,
-			"number": 9621087445
+			"region": 01,
+			"number": 5555555555
 		},
 		"user": {
-			"email": "starships@outlook.com"
+			"email": "example@domain.com"
 		}
 	}
 }
@@ -61,10 +62,10 @@ Accept: application/json
 {
 	"data": {
 		"user": {
-			"email": "starships@outlook.com"
+			"email": "example@domain.com"
 		},
 		"message": {
-			"code": "some-uuid"
+			"code": "abcdef" // len(6)
 		}
 	}
 }
@@ -74,7 +75,7 @@ Accept: application/json
 **Headers**:
 ```
 Content-Type: application/json
-Status: 200
+Status: 202 Accepted
 ```
 
 ```
@@ -84,9 +85,13 @@ Status: 200
 			"email": "starships@outlook.com"
 		},
 		"message": {
-			"code": "some-uuid"
+			"code": "abcdef"
 		},
-		"verified": true
+		"verified": true,
+		"phone": {
+                        "region": 01,
+                        "number": 5555555555
+                },
 	}
 }
 ```
