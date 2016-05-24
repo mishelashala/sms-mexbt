@@ -22,7 +22,7 @@ app.use('/api/verify', verifyRoute);
 app.use((req, res) => {
   res
     .status(HttpStatus.NOT_FOUND)
-    .json(Utils.createError(HttpStatus.NOT_FOUND));
+    .json(Utils.createStatusResponse(HttpStatus.NOT_FOUND));
 });
 
 module.exports = app;

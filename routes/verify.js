@@ -24,28 +24,27 @@ Router
         User
           .findOne({ user: { email: data.user.email }, message: { code: data.message.code }})
           .exec()
-          .then((user) => {
-            if (!user) {
+          .then((_user) => {
+            if (!_user) {
               return res
                 .status(HttpStatus.BAD_REQUEST)
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
-            if (user.code !== data.code) {
+            if (_user.message.code !== data.message.code) {
+              return res
+                .status(HttpStatus.BAD_REQUEST)
+                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
-            const newData = {
-              verified: true
-            };
-
-            return User
-              .findOneAndUpdate({ user }, { $set: { newData }})
-              .exec();
+            _user.verified = true;
+            return _user.save();
           })
           .then((doc) => {
+            console.log(doc);
             res
               .status(HttpStatus.ACCEPTED)
-              .json(Utils.createStatusResponse(HttpStatus.ACCEPTED));
+              .json({ data: doc });
           })
           .catch((err) => {
             res

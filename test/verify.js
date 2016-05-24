@@ -14,7 +14,7 @@ describe('Test /api/verify', () => {
     			email: "starships@outlook.com"
     		},
         message: {
-          code: 'ciokl2a0'
+          code: process.env.TEST_TELEPHONE_NUMBER
         }
       };
 
