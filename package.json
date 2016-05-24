@@ -7,10 +7,11 @@
     "node": ">=4.0.0"
   },
   "scripts": {
+    "setup": "nvm install stable",
     "lint": "semistandard",
     "mocha": "mocha test/*.js",
     "cover": "istanbul cover _mocha -- -R spec",
-    "test": "npm run lint && npm run cover"
+    "test": "npm run setup && npm run lint && npm run cover"
   },
   "keywords": [],
   "author": "Michell Ayala <michell@mexbt.com>",
