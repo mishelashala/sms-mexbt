@@ -1,9 +1,6 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
-const Twilio = require('twilio');
-const Mongoose = require('mongoose');
 
-const keys = require('../keys');
 const Utils = require('../utils');
 const User = require('../databases/').models.user;
 
@@ -22,7 +19,7 @@ Router
         }
 
         User
-          .findOne({ user: { email: data.user.email }, message: { code: data.message.code }})
+          .findOne({user: { email: data.user.email }})
           .exec()
           .then((_user) => {
             if (!_user) {
@@ -37,19 +34,20 @@ Router
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
+            if (_user.verified) {
+              return res
+                .status(HttpStatus.BAD_REQUEST)
+                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
+            }
+
             _user.verified = true;
-            return _user.save();
-          })
-          .then((doc) => {
-            console.log(doc);
-            res
-              .status(HttpStatus.ACCEPTED)
-              .json({ data: doc });
-          })
-          .catch((err) => {
-            res
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+            _user
+              .save()
+              .then((doc) => {
+                res
+                  .status(HttpStatus.ACCEPTED)
+                  .json({ data: doc });
+              });
           });
       },
       default () {

@@ -11,7 +11,7 @@ const verifyRoute = require('./routes/').verify;
 
 const app = Express();
 
-Mongoose.connect('mongodb://localhost/mexbt-emails');
+Mongoose.connect(require('./databases').uri);
 
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));

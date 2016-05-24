@@ -1,7 +1,6 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');
-const Mongoose = require('mongoose');
 
 const keys = require('../keys');
 const Utils = require('../utils');
@@ -23,22 +22,15 @@ Router
         }
 
         User
-          .findOne({ user: { email: data.user.email }})
+          .findOne({user: { email: data.user.email }})
           .exec()
           .then((user) => {
             if (!user) {
               return new User(data);
-            };
-
+            }
             return user;
           })
           .then((__user) => {
-            if (__user.verified) {
-              return res
-                .status(HttpStatus.BAD_REQUEST)
-                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
-            }
-
             client.messages.create({
               to: `${data.phone.region}${data.phone.number}`,
               from: keys.phone_number,
@@ -51,23 +43,13 @@ Router
               }
 
               __user.message.code = data.message.code;
-
+              __user.verified = false;
               __user
-                .save()
+                .save({ upsert: true })
                 .then((doc) => {
-                  res.status(HttpStatus.CREATED).json({ data: doc });
-                })
-                .catch((err) => {
-                  res
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+                  res.status(HttpStatus.CREATED).json({ data: __user });
                 });
             });
-          })
-          .catch((err) => {
-            res
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
           });
       },
       default () {

@@ -6,10 +6,10 @@ module.exports = function (body) {
   return {
     phone: {
       region: Number(body.data.phone.region),
-      number: Number(body.data.phone.number)
+      number: Number(process.env.TEST_PHONE_NUMBER) || Number(body.data.phone.number)
     },
     message: {
-      code: process.env.TEST_TELEPHONE_NUMBER || Cuid().slice(0, 8)
+      code: process.env.TEST_VERIFY_CODE || Cuid().slice(0, 8)
     },
     user: {
       email: String(body.data.user.email)
