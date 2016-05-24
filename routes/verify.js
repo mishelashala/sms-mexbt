@@ -19,7 +19,7 @@ Router
         }
 
         User
-          .findOne({user: { email: data.user.email }, message: { code: data.message.code }})
+          .findOne({user: { email: data.user.email }})
           .exec()
           .then((_user) => {
             if (!_user) {
@@ -34,18 +34,20 @@ Router
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
+            if (_user.verified) {
+              return res
+                .status(HttpStatus.BAD_REQUEST)
+                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
+            }
+
             _user.verified = true;
-            return _user.save();
-          })
-          .then((doc) => {
-            res
-              .status(HttpStatus.ACCEPTED)
-              .json({ data: doc });
-          })
-          .catch(() => {
-            res
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+            _user
+              .save()
+              .then((doc) => {
+                res
+                  .status(HttpStatus.ACCEPTED)
+                  .json({ data: doc });
+              });
           });
       },
       default () {

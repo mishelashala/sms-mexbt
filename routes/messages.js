@@ -31,12 +31,6 @@ Router
             return user;
           })
           .then((__user) => {
-            if (__user.verified) {
-              return res
-                .status(HttpStatus.BAD_REQUEST)
-                .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
-            }
-
             client.messages.create({
               to: `${data.phone.region}${data.phone.number}`,
               from: keys.phone_number,
@@ -49,21 +43,13 @@ Router
               }
 
               __user.message.code = data.message.code;
-              res.status(HttpStatus.CREATED).json({ data: __user });
-
+              __user.verified = false;
               __user
-                .save()
-                .catch(() => {
-                  res
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+                .save({ upsert: true })
+                .then((doc) => {
+                  res.status(HttpStatus.CREATED).json({ data: __user });
                 });
             });
-          })
-          .catch(() => {
-            res
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
           });
       },
       default () {
