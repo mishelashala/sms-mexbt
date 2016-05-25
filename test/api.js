@@ -14,7 +14,7 @@ describe('Test /api/message', () => {
 
   describe('POST', () => {
     it('should create a new email verification code', function (done) {
-      this.timeout(100000);
+      this.timeout(100000000);
 
       const data = {
         phone: {
@@ -156,7 +156,7 @@ describe('Test /api/message', () => {
     });
 
     it('should fail to send the message', function (done) {
-      this.timeout(100000);
+      this.timeout(100000000);
 
       const data = {
         phone: {
@@ -302,7 +302,9 @@ describe('Test /api/message', () => {
 
 describe('Test /api/verify', () => {
   describe('POST', () => {
-    it('should verify an email account', (done) => {
+    it('should verify an email account', function (done) {
+      this.timeout(100000000);
+
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -409,6 +411,8 @@ describe('Test /api/verify', () => {
     });
 
     it('should send an invalid email account', (done) => {
+      this.timeout(100000000);
+
       const data = {
         user: {
           email: 'example@outlook.com'
@@ -449,7 +453,9 @@ describe('Test /api/verify', () => {
         });
     });
 
-    it('should send an invalid verification code', (done) => {
+    it('should send an invalid verification code', function (done) {
+      this.timeout(100000000);
+
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -590,7 +596,9 @@ describe('Test /api/verify', () => {
 
 describe('Test /api/message', () => {
   describe('POST', () => {
-    it('should try to verify a verified account', (done) => {
+    it('should try to verify a verified account', function (done) {
+      this.timeout(100000000);
+
       const data = {
         user: {
           email: 'starships@outlook.com'
