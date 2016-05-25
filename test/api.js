@@ -12,7 +12,7 @@ describe('Test /api/message', () => {
     User.find({}).remove().exec();
   });
 
-  describe('POST', () => {
+  describe.skip('POST', () => {
     it('should create a new email verification code', function (done) {
       this.timeout(100000);
 
@@ -201,7 +201,7 @@ describe('Test /api/message', () => {
   });
 
   describe('GET', () => {
-    it('should get a 405 Method Not Allowed', (done) => {
+    it('should get a 405 Method Not Allowed error code', (done) => {
       Request(app)
         .get('/api/messages')
         .set('Accept', 'application/json')
@@ -301,7 +301,7 @@ describe('Test /api/message', () => {
 });
 
 describe('Test /api/verify', () => {
-  describe('POST', () => {
+  describe.skip('POST', () => {
     it('should verify an email account', (done) => {
       const data = {
         user: {
@@ -589,7 +589,7 @@ describe('Test /api/verify', () => {
 });
 
 describe('Test /api/message', () => {
-  describe('POST', () => {
+  describe.skip('POST', () => {
     it('should try to verify a verified account', (done) => {
       const data = {
         user: {
