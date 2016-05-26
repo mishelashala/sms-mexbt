@@ -9,7 +9,7 @@ module.exports = function (body) {
       number: Number(process.env.TEST_PHONE_NUMBER) || Number(body.data.phone.number)
     },
     message: {
-      code: process.env.TEST_VERIFY_CODE || Cuid().slice(0, 8)
+      code: String(process.env.TEST_VERIFY_CODE) || Cuid().slice(0, 8)
     },
     user: {
       email: String(body.data.user.email)

@@ -7,3 +7,8 @@ coverage
 # auto-saved files (gedit, vim)
 ~*
 *.swp
+
+# log files
+log
+logs
+*.log
