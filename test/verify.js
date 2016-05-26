@@ -3,7 +3,6 @@
 const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
-const User = require('../databases/').models.user;
 
 const app = require('../app');
 
