@@ -48,7 +48,7 @@ Router
             _user
               .save()
               .then((doc) => {
-		datadog.increment('sms.verified');
+                datadog.increment('mexbt.verification.verified');
                 res
                   .status(HttpStatus.ACCEPTED)
                   .json({ data: doc });
