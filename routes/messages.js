@@ -41,14 +41,14 @@ Router
               body: data.message.code
             }, (err, msg) => {
               if (err) {
-                datadog.increment('sms.not_sent');
+                datadog.increment('mexbt.verification.not_sent');
 
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
                   .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               }
 
-              datadog.increment('sms.sent');
+              datadog.increment('mexbt.verification.sent');
               __user.message.code = data.message.code;
               __user.verified = false;
               __user
