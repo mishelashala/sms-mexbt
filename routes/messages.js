@@ -1,6 +1,9 @@
+'use strict';
+
 const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');
+const Statsd = require('node-dogstatsd').StatsD;
 
 const keys = require('../keys');
 const Utils = require('../utils');
@@ -8,6 +11,7 @@ const User = require('../databases/').models.user;
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
+const datadog = new Statsd();
 
 Router
   .post('/', (req, res) => {
@@ -37,11 +41,14 @@ Router
               body: data.message.code
             }, (err, msg) => {
               if (err) {
+                datadog.increment('sms.not_sent');
+
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
                   .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               }
 
+              datadog.increment('sms.sent');
               __user.message.code = data.message.code;
               __user.verified = false;
               __user

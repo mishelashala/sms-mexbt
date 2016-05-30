@@ -1,10 +1,14 @@
+'use strict';
+
 const Express = require('express');
 const HttpStatus = require('http-status');
+const Statsd = require('node-dogstatsd').StatsD;
 
 const Utils = require('../utils');
 const User = require('../databases/').models.user;
 
 const Router = Express.Router();
+const datadog = new Statsd();
 
 Router
   .post('/', (req, res) => {
@@ -44,6 +48,7 @@ Router
             _user
               .save()
               .then((doc) => {
+                datadog.increment('sms.verified');
                 res
                   .status(HttpStatus.ACCEPTED)
                   .json({ data: doc });
