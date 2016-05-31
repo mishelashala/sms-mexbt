@@ -265,7 +265,7 @@ describe('Test /api/message', () => {
   });
 });
 
-describe('Test /api/message', () => {
+describe.skip('Test /api/message', () => {
   context('POST', () => {
     it('should try to verify a verified account', (done) => {
       const data = {

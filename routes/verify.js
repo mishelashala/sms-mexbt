@@ -38,7 +38,7 @@ Router
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
-            if (_user.verified) {
+            if (_user.verified === true) {
               return res
                 .status(HttpStatus.BAD_REQUEST)
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
