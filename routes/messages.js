@@ -11,7 +11,7 @@ const User = require('../databases/').models.user;
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
-const datadog = new Statsd();
+const datadog = new Statsd('localhost', 8125);
 
 Router
   .post('/', (req, res) => {
