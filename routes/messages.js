@@ -48,7 +48,6 @@ Router
                   .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               }
 
-              datadog.increment('sms.sent');
               datadog.increment('mexbt.verification.sent');
               __user.message.code = data.message.code;
               __user.verified = false;

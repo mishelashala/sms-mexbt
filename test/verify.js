@@ -8,7 +8,11 @@ const app = require('../app');
 
 describe('Test /api/verify', () => {
   context('POST', () => {
+<<<<<<< HEAD
     it.skip('should verify an email account', (done) => {
+=======
+    it('should verify an email account', (done) => {
+>>>>>>> develop
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -99,7 +103,7 @@ describe('Test /api/verify', () => {
         });
     });
 
-    it.skip('should send an invalid email account', function (done) {
+    it('should send an invalid email account', function (done) {
       this.timeout(100000000);
 
       const data = {
@@ -137,7 +141,7 @@ describe('Test /api/verify', () => {
         });
     });
 
-    it.skip('should send an invalid verification code', (done) => {
+    it('should send an invalid verification code', (done) => {
       const data = {
         user: {
           email: 'starships@outlook.com'

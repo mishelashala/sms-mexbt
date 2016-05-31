@@ -13,7 +13,7 @@ describe('Test /api/message', () => {
   });
 
   context('POST', () => {
-    it.skip('should create a new email verification code', function (done) {
+    it('should create a new email verification code', function (done) {
       this.timeout(100000);
 
       const data = {
@@ -140,7 +140,7 @@ describe('Test /api/message', () => {
         });
     });
 
-    it.skip('should fail to send the message', function (done) {
+    it('should fail to send the message', function (done) {
       this.timeout(100000);
 
       const data = {
@@ -265,8 +265,8 @@ describe('Test /api/message', () => {
   });
 });
 
-describe.skip('Test /api/message', () => {
-  context.skip('POST', () => {
+describe('Test /api/message', () => {
+  context('POST', () => {
     it('should try to verify a verified account', (done) => {
       const data = {
         user: {
