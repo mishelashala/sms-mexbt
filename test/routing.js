@@ -7,7 +7,7 @@ const Expect = require('chai').expect;
 const app = require('../app');
 
 describe('Routing', () => {
-  describe('GET /asdf', () => {
+  context('GET /asdf', () => {
     it('should return 404 Not Found', (done) => {
       Request(app)
         .get('/asdf')
