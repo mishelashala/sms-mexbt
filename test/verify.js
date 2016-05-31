@@ -7,7 +7,7 @@ const Expect = require('chai').expect;
 const app = require('../app');
 
 describe('Test /api/verify', () => {
-  describe('POST', () => {
+  context('POST', () => {
     it.skip('should verify an email account', (done) => {
       const data = {
         user: {
@@ -174,7 +174,7 @@ describe('Test /api/verify', () => {
     });
   });
 
-  describe('GET', () => {
+  context('GET', () => {
     it('should return 405 Method Not Allowed', (done) => {
       Request(app)
         .get('/api/verify')
@@ -201,7 +201,7 @@ describe('Test /api/verify', () => {
     });
   });
 
-  describe('PUT', () => {
+  context('PUT', () => {
     it('should return 405 Method Not Allowed', (done) => {
       Request(app)
         .put('/api/verify')
@@ -228,7 +228,7 @@ describe('Test /api/verify', () => {
     });
   });
 
-  describe('DELETE', () => {
+  context('DELETE', () => {
     it('should return 405 Method Not Allowed', (done) => {
       Request(app)
         .delete('/api/verify')
