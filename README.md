@@ -26,3 +26,6 @@ analysis.
 
 ## API
 Read the CONTRACT.md file
+
+## Technical Debt
+Read the DEBT.md file
