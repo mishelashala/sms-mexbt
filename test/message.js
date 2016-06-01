@@ -13,7 +13,7 @@ describe('Test /api/message', () => {
   });
 
   context('POST', () => {
-    it('should create a new email verification code', function (done) {
+    it.skip('should create a new email verification code', function (done) {
       this.timeout(100000);
 
       const data = {
@@ -258,46 +258,6 @@ describe('Test /api/message', () => {
 
           Expect(res.body.error).to.have.property('message')
             .and.to.be.equal('Method Not Allowed');
-
-          done();
-        });
-    });
-  });
-});
-
-describe.skip('Test /api/message', () => {
-  context('POST', () => {
-    it('should try to verify a verified account', (done) => {
-      const data = {
-        user: {
-          email: 'starships@outlook.com'
-        },
-        message: {
-          code: process.env.TEST_VERIFY_CODE
-        }
-      };
-
-      Request(app)
-        .post('/api/verify')
-        .set('Accept', 'application/json')
-        .send({ data })
-        .expect('content-type', /application\/json/)
-        .expect(HttpStatus.BAD_REQUEST, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
-
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.BAD_REQUEST);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Bad Request');
 
           done();
         });

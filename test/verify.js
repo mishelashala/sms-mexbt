@@ -8,7 +8,7 @@ const app = require('../app');
 
 describe('Test /api/verify', () => {
   context('POST', () => {
-    it('should verify an email account', (done) => {
+    it.skip('should verify an email account', (done) => {
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -249,6 +249,46 @@ describe('Test /api/verify', () => {
 
           Expect(res.body.error).to.have.property('message')
             .and.to.be.equal('Method Not Allowed');
+
+          done();
+        });
+    });
+  });
+});
+
+describe.skip('Test /api/message', () => {
+  context('POST', () => {
+    it('should try to verify a verified account', (done) => {
+      const data = {
+        user: {
+          email: 'starships@outlook.com'
+        },
+        message: {
+          code: process.env.TEST_VERIFY_CODE
+        }
+      };
+
+      Request(app)
+        .post('/api/verify')
+        .set('Accept', 'application/json')
+        .send({ data })
+        .expect('content-type', /application\/json/)
+        .expect(HttpStatus.BAD_REQUEST, (err, res) => {
+          if (err) {
+            return done(err);
+          }
+
+          Expect(res).to.have.property('body')
+            .and.to.be.an('object');
+
+          Expect(res.body).to.have.property('error')
+            .and.to.be.an('object');
+
+          Expect(res.body.error).to.have.property('status')
+            .and.to.be.equal(HttpStatus.BAD_REQUEST);
+
+          Expect(res.body.error).to.have.property('message')
+            .and.to.be.equal('Bad Request');
 
           done();
         });
