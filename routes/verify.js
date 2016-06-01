@@ -12,8 +12,14 @@ const datadog = new Statsd('localhost', 8125);
 
 Router
   .post('/', (req, res) => {
+    /*!
+     * Content negotiation (REST)
+     */
     res.format({
       'application/json' () {
+        /*!
+         * Store the data from request body
+         */
         const data = req.body.data;
 
         if (!data.message.code || !data.user.email) {
@@ -22,6 +28,9 @@ Router
             .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
         }
 
+        /*!
+         * Search one user in the database using the email as query
+         */
         User
           .findOne({user: { email: data.user.email }})
           .exec()
@@ -44,10 +53,17 @@ Router
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
+            /*!
+             * Change user verified status and then save
+             * the changes in the database.
+             */
             _user.verified = true;
             _user
               .save()
               .then((doc) => {
+                /*
+                 * Report to datadog
+                 */
                 datadog.increment('mexbt.verification.verified');
                 res
                   .status(HttpStatus.ACCEPTED)
@@ -55,6 +71,10 @@ Router
               });
           });
       },
+      /*!
+       * If the Accept header is different from application/json
+       * this code is executed
+       */
       default () {
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
@@ -62,6 +82,10 @@ Router
       }
     });
   })
+
+  /*!
+   * The rest of the HTTP Verbs are not allowed
+   */
   .get('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)

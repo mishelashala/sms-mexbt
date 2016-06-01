@@ -13,12 +13,24 @@ const app = Express();
 
 Mongoose.connect(require('./databases').uri);
 
+/*!
+ * Always create a JSON representation of the
+ * body request
+ */
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
 
+/*!
+ * Routing (endpoints)
+ */
 app.use('/api/messages/', messagesRoute);
 app.use('/api/verify', verifyRoute);
 
+/*!
+ * Not Found Middleware
+ * If the route is not defined in the routers,
+ * this middleware will be called
+ */
 app.use((req, res) => {
   res
     .status(HttpStatus.NOT_FOUND)

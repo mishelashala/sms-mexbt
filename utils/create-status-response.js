@@ -2,6 +2,11 @@
 
 const HttpStatus = require('http-status');
 
+/*!
+ * Concrete Http Errors factory
+ * @param {Number} - Http Status Code
+ * @return {Object} - The error object
+ */
 module.exports = function (error) {
   switch (error) {
     case HttpStatus.BAD_REQUEST:
