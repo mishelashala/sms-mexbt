@@ -7,8 +7,8 @@ const Expect = require('chai').expect;
 const app = require('../app');
 
 describe('Test /api/verify', () => {
-  describe('POST', () => {
-    it.skip('should verify an email account', (done) => {
+  context('POST', () => {
+    it('should verify an email account', (done) => {
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -99,7 +99,7 @@ describe('Test /api/verify', () => {
         });
     });
 
-    it.skip('should send an invalid email account', function (done) {
+    it('should send an invalid email account', function (done) {
       this.timeout(100000000);
 
       const data = {
@@ -137,7 +137,7 @@ describe('Test /api/verify', () => {
         });
     });
 
-    it.skip('should send an invalid verification code', (done) => {
+    it('should send an invalid verification code', (done) => {
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -174,7 +174,7 @@ describe('Test /api/verify', () => {
     });
   });
 
-  describe('GET', () => {
+  context('GET', () => {
     it('should return 405 Method Not Allowed', (done) => {
       Request(app)
         .get('/api/verify')
@@ -201,7 +201,7 @@ describe('Test /api/verify', () => {
     });
   });
 
-  describe('PUT', () => {
+  context('PUT', () => {
     it('should return 405 Method Not Allowed', (done) => {
       Request(app)
         .put('/api/verify')
@@ -228,7 +228,7 @@ describe('Test /api/verify', () => {
     });
   });
 
-  describe('DELETE', () => {
+  context('DELETE', () => {
     it('should return 405 Method Not Allowed', (done) => {
       Request(app)
         .delete('/api/verify')

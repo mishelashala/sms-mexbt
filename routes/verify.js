@@ -8,7 +8,7 @@ const Utils = require('../utils');
 const User = require('../databases/').models.user;
 
 const Router = Express.Router();
-const datadog = new Statsd();
+const datadog = new Statsd('localhost', 8125);
 
 Router
   .post('/', (req, res) => {

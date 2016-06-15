@@ -11,7 +11,7 @@ const User = require('../databases/').models.user;
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
-const datadog = new Statsd();
+const datadog = new Statsd('localhost', 8125);
 
 Router
   .post('/', (req, res) => {
@@ -42,13 +42,11 @@ Router
             }, (err, msg) => {
               if (err) {
                 datadog.increment('mexbt.verification.not_sent');
-
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
                   .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               }
 
-	      datadog.increment('sms.sent');
               datadog.increment('mexbt.verification.sent');
               __user.message.code = data.message.code;
               __user.verified = false;

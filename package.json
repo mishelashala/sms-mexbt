@@ -22,9 +22,8 @@
     "http-status": "0.2.2",
     "mongoose": "4.4.17",
     "node-dogstatsd": "0.0.6",
-    "twilio": "2.9.1"
-  },
-  "devDependencies": {
+    "supertest": "^1.2.0",
+    "twilio": "2.9.1",
     "chai": "3.5.0",
     "istanbul": "0.4.3",
     "mocha": "2.4.5",
