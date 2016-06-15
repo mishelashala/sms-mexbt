@@ -4,6 +4,7 @@ const Express = require('express');
 const BodyParser = require('body-parser');
 const HttpStatus = require('http-status');
 const Mongoose = require('mongoose');
+const cors = require('cors');
 
 const Utils = require('./utils');
 const messagesRoute = require('./routes/').messages;
@@ -19,6 +20,7 @@ Mongoose.connect(require('./databases').uri);
  */
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
+app.use(cors());
 
 /*!
  * Routing (endpoints)
