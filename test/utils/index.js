@@ -8,11 +8,11 @@ describe('valid-data util', () => {
   it('should pass correct data', () => {
     const data = {
       phone: {
-        region: "52",
-        number: "9621087445"
+        region: '52',
+        number: '9621087445'
       },
       user: {
-        email: "starships@outlook.com"
+        email: 'starships@outlook.com'
       }
     };
 
