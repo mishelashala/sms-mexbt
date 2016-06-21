@@ -8,8 +8,10 @@
 
 module.exports = function (data) {
   return (
-    data.phone.number !== 0 &&
-    data.phone.region !== 0 &&
-    isNaN(data.user.email)
+    !!String(data.phone.number) !== false &&
+    !!String(data.phone.region) !== false &&
+    data.phone.region.length === 2 &&
+    data.phone.number.length === 10 &&
+    !!String(data.user.email) !== false
   );
 };
