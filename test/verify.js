@@ -8,7 +8,7 @@ const app = require('../app');
 
 describe('Test /api/verify', () => {
   context('POST', () => {
-    it.skip('should verify an email account', (done) => {
+    it('should verify an email account', (done) => {
       const data = {
         user: {
           email: 'starships@outlook.com'
@@ -256,7 +256,7 @@ describe('Test /api/verify', () => {
   });
 });
 
-describe.skip('Test /api/message', () => {
+describe('Test /api/message', () => {
   context('POST', () => {
     it('should try to verify a verified account', (done) => {
       const data = {
