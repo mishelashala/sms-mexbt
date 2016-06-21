@@ -5,6 +5,7 @@
  * @param {Object} - Data to validate
  * @return {Boolean} - The data is valid or not
  */
+
 module.exports = function (data) {
   return (
     data.phone.number !== 0 &&
