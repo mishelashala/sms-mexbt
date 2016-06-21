@@ -54,7 +54,7 @@ Router
              * Send the message using twilio library
              */
             client.messages.create({
-              to: `${data.phone.region}${data.phone.number}`,
+              to: `+${data.phone.region}${data.phone.number}`,
               from: keys.phone_number,
               body: data.message.code
             }, (err, msg) => {
@@ -62,6 +62,7 @@ Router
                * If something went wrong report to datadog and
                * send a error response
                */
+
               if (err) {
                 datadog.increment('mexbt.verification.not_sent');
                 return res

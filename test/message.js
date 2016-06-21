@@ -49,7 +49,7 @@ describe('Test /api/message', () => {
             .and.to.be.a('string');
 
           Expect(res.body.data.phone).to.have.property('region')
-            .and.to.be.equal(data.phone.region);
+            .and.to.be.equal(Number(data.phone.region));
 
           Expect(res.body.data.phone).to.have.property('number')
             .and.to.be.equal(Number(data.phone.number));
@@ -107,11 +107,11 @@ describe('Test /api/message', () => {
     it('should send incomplete data', (done) => {
       const data = {
         phone: {
-          region: null,
-          number: null
+          region: '',
+          number: ''
         },
         user: {
-          email: null
+          email: ''
         }
       };
 
@@ -158,7 +158,7 @@ describe('Test /api/message', () => {
         .set('Accept', 'application/json')
         .send({ data })
         .expect('content-type', /application\/json/)
-        .expect(HttpStatus.INTERNAL_SERVER_ERROR, (err, res) => {
+        .expect(HttpStatus.BAD_REQUEST, (err, res) => {
           if (err) {
             return done(err);
           }
@@ -170,10 +170,10 @@ describe('Test /api/message', () => {
             .and.to.be.an('object');
 
           Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.INTERNAL_SERVER_ERROR);
+            .and.to.be.equal(HttpStatus.BAD_REQUEST);
 
           Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Internal Server Error');
+            .and.to.be.equal('Bad Request');
 
           done();
         });
