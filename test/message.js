@@ -18,7 +18,7 @@ describe('Test /api/message', () => {
 
       const data = {
         phone: {
-          region: 52,
+          region: process.env.TEST_PHONE_REGION,
           number: process.env.TEST_PHONE_NUMBER
         },
         user: {
@@ -70,8 +70,8 @@ describe('Test /api/message', () => {
     it('should send the wrong Accept header', (done) => {
       const data = {
         phone: {
-          region: 52,
-          number: 9621087445
+          region: process.env.TEST_PHONE_REGION,
+          number: process.env.TEST_PHONE_REGION
         },
         user: {
           email: 'starships@outlook.com'
