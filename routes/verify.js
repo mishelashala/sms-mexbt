@@ -2,13 +2,12 @@
 
 const Express = require('express');
 const HttpStatus = require('http-status');
-const Statsd = require('node-dogstatsd').StatsD;
 
 const Utils = require('../utils');
 const User = require('../databases/').models.user;
 
 const Router = Express.Router();
-const datadog = new Statsd('localhost', 8125);
+const datadog = Utils.datadog;
 
 Router
   .post('/', (req, res) => {
@@ -25,6 +24,8 @@ Router
         const data = req.body.data;
 
         if (!data.message.code || !data.user.email) {
+          datadog('verify_message', 'invalid_user_input');
+
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
@@ -39,18 +40,24 @@ Router
           .exec()
           .then((_user) => {
             if (!_user) {
+              datadog('verify_message', 'invalid_user_email');
+
               return res
                 .status(HttpStatus.BAD_REQUEST)
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
             if (_user.message.code !== data.message.code) {
+              datadog('verify_message', 'invalid_user_code');
+
               return res
                 .status(HttpStatus.BAD_REQUEST)
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
             }
 
             if (_user.verified === true) {
+              datadog('verify_message', 'user_already_verified');
+
               return res
                 .status(HttpStatus.BAD_REQUEST)
                 .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
@@ -69,7 +76,7 @@ Router
                  * Report to datadog
                  */
 
-                datadog.increment('mexbt.verification.verified');
+                datadog('verify_message', 'user_verified');
 
                 res
                   .status(HttpStatus.ACCEPTED)
@@ -84,6 +91,8 @@ Router
        */
 
       default () {
+        datadog('verify_message', 'bad_content_negotiation');
+
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
           .json(Utils.createStatusResponse(HttpStatus.NOT_ACCEPTABLE));
@@ -96,18 +105,24 @@ Router
    */
 
   .get('/', (req, res) => {
+    datadog('verify_message', 'method_not_allowed');
+
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
 
   .put('/', (req, res) => {
+    datadog('verify_message', 'method_not_allowed');
+
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
 
   .delete('/', (req, res) => {
+    datadog('verify_message', 'method_not_allowed');
+
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
