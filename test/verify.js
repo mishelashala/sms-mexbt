@@ -4,6 +4,7 @@ const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
 
+const keys = require('../keys');
 const app = require('../app');
 
 describe('Test /api/verify', () => {
@@ -11,10 +12,10 @@ describe('Test /api/verify', () => {
     it('should verify an email account', (done) => {
       const data = {
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         },
         message: {
-          code: process.env.TEST_VERIFY_CODE
+          code: keys.verification_code
         }
       };
 
@@ -66,7 +67,7 @@ describe('Test /api/verify', () => {
     it('should send incomplete data', (done) => {
       const data = {
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         },
         message: {
           code: ''
@@ -107,7 +108,7 @@ describe('Test /api/verify', () => {
           email: 'example@outlook.com'
         },
         message: {
-          code: process.env.TEST_VERIFY_CODE
+          code: keys.verification_code
         }
       };
 
@@ -140,7 +141,7 @@ describe('Test /api/verify', () => {
     it('should send an invalid verification code', (done) => {
       const data = {
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         },
         message: {
           code: String(231456677777)

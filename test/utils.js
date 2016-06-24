@@ -2,6 +2,7 @@
 
 const Expect = require('chai').expect;
 
+const keys = require('../keys');
 const validData = require('../utils').validData;
 
 describe('utilities', () => {
@@ -9,11 +10,11 @@ describe('utilities', () => {
     it('should pass valid data', () => {
       const data = {
         phone: {
-          region: '52',
-          number: '9621087445'
+          region: keys.phone_region,
+          number: keys.phone_number
         },
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         }
       };
 

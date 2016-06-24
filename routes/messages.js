@@ -14,21 +14,24 @@ const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 const datadog = new Statsd('localhost', 8125);
 
 Router
-  /*!
-   * Content negotiation (REST)
-   */
   .post('/', (req, res) => {
+    /*!
+    * Content negotiation (REST)
+    */
     res.format({
       'application/json' () {
+
         /*!
          * #createVerificationData takes the body of the request
          * and return a formated object
          */
+
         const data = Utils.createVerificationData(req.body);
 
         /*!
          * If some field is missing...
          */
+
         if (!Utils.validData(data)) {
           return res
             .status(HttpStatus.BAD_REQUEST)
@@ -49,15 +52,16 @@ Router
 
             return user;
           })
-          .then((__user) => {
+          .then((_user) => {
             /*!
              * Send the message using twilio library
              */
             client.messages.create({
               to: `+${data.phone.region}${data.phone.number}`,
-              from: keys.phone_number,
+              from: keys.twilio_phone_number,
               body: data.message.code
             }, (err, msg) => {
+
               /*!
                * If something went wrong report to datadog and
                * send a error response
@@ -74,27 +78,31 @@ Router
                * Report to datadog message sent.
                * Set code message to user and verified to false
                */
+
               datadog.increment('mexbt.verification.sent');
-              __user.message.code = data.message.code;
-              __user.verified = false;
+              _user.message.code = data.message.code;
+              _user.verified = false;
 
               /*!
                * Save the user, if is not in the data base
                * upsert (create the user) and then
                * send the response
                */
-              __user
+
+              _user
                 .save({ upsert: true })
                 .then((doc) => {
-                  res.status(HttpStatus.CREATED).json({ data: __user });
+                  res.status(HttpStatus.CREATED).json({ data: _user });
                 });
             });
           });
       },
+
       /*!
        * If the Accept header is different from application/json
        * this code is executed
        */
+
       default () {
         res
           .status(HttpStatus.NOT_ACCEPTABLE)

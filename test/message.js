@@ -3,11 +3,12 @@
 const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
-const User = require('../databases/').models.user;
 
+const keys = require('../keys');
+const User = require('../databases/').models.user;
 const app = require('../app');
 
-describe('Test /api/message', () => {
+describe('Test /api/messages', () => {
   before(() => {
     User.find({}).remove().exec();
   });
@@ -18,11 +19,11 @@ describe('Test /api/message', () => {
 
       const data = {
         phone: {
-          region: process.env.TEST_PHONE_REGION,
-          number: process.env.TEST_PHONE_NUMBER
+          region: keys.phone_region,
+          number: keys.phone_number
         },
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         },
         verified: false
       };
@@ -70,11 +71,11 @@ describe('Test /api/message', () => {
     it('should send the wrong Accept header', (done) => {
       const data = {
         phone: {
-          region: process.env.TEST_PHONE_REGION,
-          number: process.env.TEST_PHONE_REGION
+          region: keys.phone_number,
+          number: keys.phone_region
         },
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         }
       };
 
