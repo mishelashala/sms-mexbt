@@ -3,7 +3,6 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');
-const Statsd = require('node-dogstatsd').StatsD;
 
 const keys = require('../keys');
 const Utils = require('../utils');
@@ -11,7 +10,8 @@ const User = require('../databases/').models.user;
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
-const datadog = new Statsd('localhost', 8125);
+
+const datadog = Utils.datadog;
 
 Router
   .post('/', (req, res) => {
@@ -32,6 +32,8 @@ Router
          */
 
         if (!Utils.validData(data)) {
+          datadog('send_message', 'invalid_user_input');
+
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
@@ -68,7 +70,8 @@ Router
                */
 
               if (err) {
-                datadog.increment('mexbt.verification.not_sent');
+                datadog('send_message', 'error_sending_sms');
+
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
                   .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
@@ -79,7 +82,7 @@ Router
                * Set code message to user and verified to false
                */
 
-              datadog.increment('mexbt.verification.sent');
+              datadog('send_message', 'message_sent');
               _user.message.code = data.message.code;
               _user.verified = false;
 
@@ -92,6 +95,7 @@ Router
               _user
                 .save({ upsert: true })
                 .then((doc) => {
+                  datadog('send_message', 'message_database_saved');
                   res.status(HttpStatus.CREATED).json({ data: _user });
                 });
             });
@@ -104,6 +108,8 @@ Router
        */
 
       default () {
+        datadog('send_message', 'bad_content_negotiation');
+
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
           .json(Utils.createStatusResponse(HttpStatus.NOT_ACCEPTABLE));
@@ -116,16 +122,24 @@ Router
    */
 
   .get('/', (req, res) => {
+    datadog('send_message', 'method_not_allowed');
+
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
+
   .put('/', (req, res) => {
+    datadog('send_message', 'method_not_allowed');
+
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
+
   .delete('/', (req, res) => {
+    datadog('send_message', 'method_not_allowed');
+
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
