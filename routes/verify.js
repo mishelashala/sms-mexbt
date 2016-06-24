@@ -81,7 +81,17 @@ Router
                 res
                   .status(HttpStatus.ACCEPTED)
                   .json({ data: doc });
+              })
+              .catch(() => {
+                datadog('verify_message', 'error_database_verifying_user');
+
+                res
+                  .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                  .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               });
+          })
+          .catch(() => {
+            datadog('verify_message', 'error_database_connection');
           });
       },
 
