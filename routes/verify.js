@@ -15,11 +15,13 @@ Router
     /*!
      * Content negotiation (REST)
      */
+
     res.format({
       'application/json' () {
         /*!
          * Store the data from request body
          */
+
         const data = req.body.data;
 
         if (!data.message.code || !data.user.email) {
@@ -31,8 +33,9 @@ Router
         /*!
          * Search one user in the database using the email as query
          */
+
         User
-          .findOne({user: { email: data.user.email }})
+          .findOne({ user: { email: data.user.email } })
           .exec()
           .then((_user) => {
             if (!_user) {
@@ -57,6 +60,7 @@ Router
              * Change user verified status and then save
              * the changes in the database.
              */
+
             _user.verified = true;
             _user
               .save()
@@ -64,17 +68,21 @@ Router
                 /*
                  * Report to datadog
                  */
+
                 datadog.increment('mexbt.verification.verified');
+
                 res
                   .status(HttpStatus.ACCEPTED)
                   .json({ data: doc });
               });
           });
       },
+
       /*!
        * If the Accept header is different from application/json
        * this code is executed
        */
+
       default () {
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
@@ -86,16 +94,19 @@ Router
   /*!
    * The rest of the HTTP Verbs are not allowed
    */
+
   .get('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
+
   .put('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
       .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
   })
+
   .delete('/', (req, res) => {
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)

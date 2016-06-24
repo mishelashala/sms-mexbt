@@ -2,6 +2,8 @@
 
 const Cuid = require('cuid');
 
+const keys = require('../keys');
+
 /*!
  * Takes the body and format its data
  * @param {Object} - Body Request
@@ -15,7 +17,7 @@ module.exports = function (body) {
       number: body.data.phone.number
     },
     message: {
-      code: process.env.TEST_VERIFY_CODE || Cuid().slice(0, 8)
+      code: keys.verification_code || Cuid().slice(0, 8)
     },
     user: {
       email: body.data.user.email
