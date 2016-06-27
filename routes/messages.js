@@ -106,7 +106,7 @@ Router
                   datadog('send_message', 'message_database_saved');
                   res.status(HttpStatus.CREATED).json({ data: _user });
                 })
-                .error(()) => {
+                .error(() => {
                   datadog('send_message', 'error_database_registering_user');
 
                   res
