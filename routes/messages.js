@@ -106,21 +106,33 @@ Router
                   datadog('send_message', 'message_database_saved');
                   res.status(HttpStatus.CREATED).json({ data: _user });
                 })
-                .error(() => {
+                .error((err) => {
                   datadog('send_message', 'error_database_registering_user');
 
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json(Util.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+                    .json({
+                      error: {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        message: 'Internal Server Error'
+                      },
+                      err: err
+                    });
                 });
             });
           })
-          .catch(() => {
+          .catch((err) => {
             datadog('send_message', 'error_database_connection');
 
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Util.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+              .json({
+                error: {
+                  status: HttpStatus.INTERNAL_SERVER_ERROR,
+                  message: 'Internal Server Error'
+                },
+                err: err
+              });
           });
       },
 
