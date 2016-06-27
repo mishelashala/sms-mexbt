@@ -112,7 +112,7 @@ Router
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .json(Util.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
-                };
+                });
             });
           })
           .catch(() => {
