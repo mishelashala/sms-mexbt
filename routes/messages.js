@@ -74,7 +74,15 @@ Router
 
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+                  .json({
+                    error: {
+                      status: HttpStatus.INTERNAL_SERVER_ERROR,
+                      message: 'Internal Server Error'
+                    },
+                    twilio: {
+                      err: err
+                    }
+                  });
               }
 
               /*!
