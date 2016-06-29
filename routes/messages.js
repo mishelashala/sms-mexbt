@@ -77,15 +77,7 @@ Router
 
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .json({
-                    error: {
-                      status: HttpStatus.INTERNAL_SERVER_ERROR,
-                      message: 'Internal Server Error'
-                    },
-                    twilio: {
-                      err: err
-                    }
-                  });
+                  .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
               }
 
               /*!
@@ -114,13 +106,7 @@ Router
 
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json({
-                      error: {
-                        status: HttpStatus.INTERNAL_SERVER_ERROR,
-                        message: 'Internal Server Error'
-                      },
-                      err: err
-                    });
+                    .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
                 });
             });
           })
@@ -129,13 +115,7 @@ Router
 
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json({
-                error: {
-                  status: HttpStatus.INTERNAL_SERVER_ERROR,
-                  message: 'Internal Server Error'
-                },
-                err: err
-              });
+              .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
           });
       },
 
