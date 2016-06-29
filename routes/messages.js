@@ -3,6 +3,7 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');
+const Mongoose = require('mongoose');
 
 const keys = require('../keys');
 const Utils = require('../utils');
@@ -12,6 +13,8 @@ const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 
 const datadog = Utils.datadog;
+
+Mongoose.Promise = Promise;
 
 Router
   .post('/', (req, res) => {
@@ -106,7 +109,7 @@ Router
                   datadog('send_message', 'message_database_saved');
                   res.status(HttpStatus.CREATED).json({ data: _user });
                 })
-                .error((err) => {
+                .catch((err) => {
                   datadog('send_message', 'error_database_registering_user');
 
                   res
