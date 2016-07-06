@@ -2,6 +2,7 @@
 
 const Express = require('express');
 const HttpStatus = require('http-status');
+const Axios = require('axios');
 
 const Utils = require('../utils');
 const User = require('../databases/').models.user;
@@ -78,12 +79,67 @@ Router
 
                 datadog('verify_message', 'user_verified');
 
-                res
-                  .status(HttpStatus.ACCEPTED)
-                  .json({ data: doc });
+                /*!
+                 * Login To Alphapoint
+                 */
+
+                return Axios.post('https://sim.mexbt.com:8451/ajax/v1/Login', {
+                    "adminUserId": "william",
+                    "password": "william123"
+                  });
               })
-              .catch(() => {
-                datadog('verify_message', 'error_database_verifying_user');
+              .then((response) => {
+                /*!
+                 * If login was successfull return response
+                 */
+
+                if (response.data.isAccepted === true) {
+                  return response.data;
+                }
+
+                /*!
+                 * If login was not successfull return error
+                 */
+
+                return Promise.reject({ message: 'Alphapoint Auth' });
+              })
+              .then((data) => {
+                /*!
+                 * Change user verification level
+                 */
+
+                return Axios.post('https://sim.mexbt.com:8451/ajax/v1/SetUserVerificationLevel', {
+                  sessionToken: data.sessionToken,
+                  UserId: _user.user.email,
+                  VerificationLevel: "3"
+                });
+              })
+              .then((response) => {
+                /*!
+                 * If verification level changed response 202 Accepted
+                 */
+
+                if (response.data.isAccepted === true) {
+                  res
+                    .status(HttpStatus.ACCEPTED)
+                    .json({
+                      status: {
+                        code: HttpStatus.ACCEPTED,
+                        message: 'Accepted'
+                      }
+                    });
+                }
+
+                return Promise.reject({ message: 'Alphapoint Change VerificationLevel' });
+              })
+              .catch((err) => {
+                if (err.message === 'Alphapoint Auth') {
+                  datadog('verify_message', 'alphapoint_auth');
+                } else if (err.message === 'Alphapoint Change VerificationLevel') {
+                  datadog('verify_message', 'alphapoint_change_verification_level')
+                } else {
+                  datadog('verify_message', 'error_database_verifying_user');
+                }
 
                 res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)

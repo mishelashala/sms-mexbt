@@ -31,8 +31,14 @@ describe('Test /api/verify', () => {
           Expect(res).to.have.property('body')
             .and.to.be.an('object');
 
-          Expect(res.body).to.have.property('data')
+          Expect(res.body).to.have.property('status')
             .and.to.be.an('object');
+
+          Expect(res.body.status).to.have.property('code')
+            .and.to.be.equal(HttpStatus.ACCEPTED);
+
+          Expect(res.body.status).to.have.property('message')
+            .and.to.be.equal('Accepted');
 
           done();
         });
