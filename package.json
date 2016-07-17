@@ -1,8 +1,8 @@
 {
-  "name": "twilio-email-verification",
-  "version": "2.0.0",
-  "description": "email verification microservice",
-  "main": "server.js",
+  "name": "sms.mexbt",
+  "version": "2.1.0",
+  "description": "Email Verification Service",
+  "main": "app.js",
   "engines": {
     "node": ">=4.0.0"
   },

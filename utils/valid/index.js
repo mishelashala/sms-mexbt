@@ -1,12 +1,6 @@
 'use strict';
 
-/*!
- * Takes the request body data and validates it
- * @param {Object} - Data to validate
- * @return {Boolean} - The data is valid or not
- */
-
-module.exports = function (data) {
+const message = (data) => {
   return (
     !!String(data.phone.number) !== false &&
     !!String(data.phone.region) !== false &&
@@ -20,3 +14,8 @@ module.exports = function (data) {
     data.phone.region !== undefined
   );
 };
+
+const verificationData = () => {
+};
+
+module.exports = { message, verificationData };

@@ -10,7 +10,7 @@ const keys = require('../keys');
  * @return {Object} - Data formated
  */
 
-module.exports = function (body) {
+const messageData = (body) => {
   return {
     phone: {
       region: body.phone.region,
@@ -24,3 +24,5 @@ module.exports = function (body) {
     }
   };
 };
+
+module.exports = { messageData };
