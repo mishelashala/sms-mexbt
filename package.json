@@ -1,8 +1,8 @@
 {
-  "name": "twilio-email-verification",
-  "version": "0.1.0",
-  "description": "email verification microservice",
-  "main": "server.js",
+  "name": "sms.mexbt",
+  "version": "1.0.0",
+  "description": "Email verification service",
+  "main": "app.js",
   "engines": {
     "node": ">=4.0.0"
   },
@@ -14,7 +14,7 @@
   },
   "keywords": [],
   "author": "Michell Ayala <michell@mexbt.com>",
-  "license": "ISC",
+  "license": "",
   "dependencies": {
     "axios": "0.12.0",
     "body-parser": "1.15.1",
