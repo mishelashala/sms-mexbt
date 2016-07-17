@@ -3,21 +3,26 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');
+const Mongoose = require('mongoose');
 
+const Response = require('../utils/response');
+const ClientStatus = require('../utils/client-status');
 const keys = require('../keys');
 const Utils = require('../utils');
 const User = require('../databases/').models.user;
+const Datadog = require('../utils/datadog');
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 
-const datadog = Utils.datadog;
+Mongoose.Promise = Promise;
 
 Router
   .post('/', (req, res) => {
     /*!
     * Content negotiation (REST)
     */
+
     res.format({
       'application/json' () {
         /*!
@@ -32,11 +37,16 @@ Router
          */
 
         if (!Utils.validData(data)) {
-          datadog('send_message', 'invalid_user_input');
+          Datadog.report('send_message', 'invalid_user_input');
+
+          const responseObject = Response.create(
+            HttpStatus.BAD_REQUEST,
+            ClientStatus.INVALID_USER_INPUT
+          );
 
           return res
             .status(HttpStatus.BAD_REQUEST)
-            .json(Utils.createStatusResponse(HttpStatus.BAD_REQUEST));
+            .json(responseObject);
         }
 
         /*!
@@ -70,11 +80,16 @@ Router
                */
 
               if (err) {
-                datadog('send_message', 'error_sending_sms');
+                Datadog.report('send_message', 'error_sending_sms');
+
+                const responseObject = Response.create(
+                  HttpStatus.INTERNAL_SERVER_ERROR,
+                  ClientStatus.MESSAGE_NOT_SENT
+                );
 
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .json(Utils.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+                  .json(responseObject);
               }
 
               /*!
@@ -82,7 +97,7 @@ Router
                * Set code message to user and verified to false
                */
 
-              datadog('send_message', 'message_sent');
+              Datadog.report('send_message', 'message_sent');
               _user.message.code = data.message.code;
               _user.verified = false;
 
@@ -95,24 +110,43 @@ Router
               _user
                 .save({ upsert: true })
                 .then((doc) => {
-                  datadog('send_message', 'message_database_saved');
-                  res.status(HttpStatus.CREATED).json({ data: _user });
+                  Datadog.report('send_message', 'message_database_saved');
+
+                  const responseObject = Response.create(
+                    HttpStatus.CREATED,
+                    ClientStatus.MESSAGE_SENT,
+                    _user
+                  );
+
+                  res
+                    .status(HttpStatus.CREATED)
+                    .json(responseObject);
                 })
-                .error(()) => {
-                  datadog('send_message', 'error_database_registering_user');
+                .error(() => {
+                  Datadog.report('send_message', 'error_database_registering_user');
+
+                  const responseObject = Response.create(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ClientStatus.MESSAGE_NOT_SENT
+                  );
 
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .json(Util.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
-                };
+                    .json(responseObject);
+                });
             });
           })
           .catch(() => {
-            datadog('send_message', 'error_database_connection');
+            Datadog.report('send_message', 'error_database_connection');
+
+            const responseObject = Response.create(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              ClientStatus.DATABASE_CONNECTION_FAILED
+            );
 
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .json(Util.createStatusResponse(HttpStatus.INTERNAL_SERVER_ERROR));
+              .json(responseObject);
           });
       },
 
@@ -122,11 +156,15 @@ Router
        */
 
       default () {
-        datadog('send_message', 'bad_content_negotiation');
+        Datadog.report('send_message', 'bad_content_negotiation');
+
+        const responseObject = Response.create(
+          HttpStatus.NOT_ACCEPTABLE
+        );
 
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(Utils.createStatusResponse(HttpStatus.NOT_ACCEPTABLE));
+          .json(responseObject);
       }
     });
   })
@@ -136,27 +174,39 @@ Router
    */
 
   .get('/', (req, res) => {
-    datadog('send_message', 'method_not_allowed');
+    Datadog.report('send_message', 'method_not_allowed');
+
+    const responseObject = Response.create(
+      HttpStatus.METHOD_NOT_ALLOWED
+    );
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
+      .json(responseObject);
   })
 
   .put('/', (req, res) => {
-    datadog('send_message', 'method_not_allowed');
+    Datadog.report('send_message', 'method_not_allowed');
+
+    const responseObject = Response.create(
+      HttpStatus.METHOD_NOT_ALLOWED
+    );
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
+      .json(responseObject);
   })
 
   .delete('/', (req, res) => {
-    datadog('send_message', 'method_not_allowed');
+    Datadog.report('send_message', 'method_not_allowed');
+
+    const responseObject = Response.create(
+      HttpStatus.METHOD_NOT_ALLOWED
+    );
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(Utils.createStatusResponse(HttpStatus.METHOD_NOT_ALLOWED));
+      .json(responseObject);
   });
 
 module.exports = Router;

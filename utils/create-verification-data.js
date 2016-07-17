@@ -13,14 +13,14 @@ const keys = require('../keys');
 module.exports = function (body) {
   return {
     phone: {
-      region: body.data.phone.region,
-      number: body.data.phone.number
+      region: body.phone.region,
+      number: body.phone.number
     },
     message: {
       code: keys.verification_code || Cuid().slice(0, 8)
     },
     user: {
-      email: body.data.user.email
+      email: body.user.email
     }
   };
 };
