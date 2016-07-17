@@ -1,6 +1,6 @@
 {
   "name": "twilio-email-verification",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "email verification microservice",
   "main": "server.js",
   "engines": {
@@ -16,6 +16,7 @@
   "author": "Michell Ayala <michell@mexbt.com>",
   "license": "ISC",
   "dependencies": {
+    "axios": "0.12.0",
     "body-parser": "1.15.1",
     "cors": "2.7.1",
     "cuid": "1.3.8",

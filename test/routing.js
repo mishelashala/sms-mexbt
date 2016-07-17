@@ -18,17 +18,11 @@ describe('Routing', () => {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.NOT_FOUND);
 
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.NOT_FOUND);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Not Found');
+          Expect(res.body.server.message)
+            .to.be.equal('Not Found');
 
           done();
         });
