@@ -2,11 +2,11 @@
 
 const Expect = require('chai').expect;
 
-const keys = require('../keys');
-const Valid = require('../utils/valid');
+const keys = require('../../keys');
+const Valid = require('../../utils/valid');
 
-describe('Utils', () => {
-  context('valid #message', () => {
+describe('Data Validator', () => {
+  context('#message', () => {
     it('should return true if data is valid', () => {
       const data = {
         phone: {
@@ -81,7 +81,7 @@ describe('Utils', () => {
     });
   });
 
-  context('valid #verification', () => {
+  context('#verification', () => {
     it('should return false if message property is not present', () => {
       const data = {
         user: {
