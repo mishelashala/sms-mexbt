@@ -6,7 +6,7 @@ const HttpStatus = require('http-status');
 const Mongoose = require('mongoose');
 const cors = require('cors');
 
-const Utils = require('./utils');
+const Response = require('./utils/response');
 const messagesRoute = require('./routes/').messages;
 const verifyRoute = require('./routes/').verify;
 
@@ -36,7 +36,7 @@ app.use('/api/verify', verifyRoute);
 app.use((req, res) => {
   res
     .status(HttpStatus.NOT_FOUND)
-    .json(Utils.createStatusResponse(HttpStatus.NOT_FOUND));
+    .json(Response.create({ http: HttpStatus.NOT_FOUND }));
 });
 
 module.exports = app;

@@ -1,15 +1,15 @@
 {
   "name": "sms.mexbt",
-  "version": "1.0.0",
-  "description": "Email verification service",
+  "version": "2.2.0",
+  "description": "Email Verification Service",
   "main": "app.js",
   "engines": {
     "node": ">=4.0.0"
   },
   "scripts": {
     "lint": "semistandard",
-    "mocha": "mocha test/*.js",
-    "cover": "istanbul cover _mocha -- -R spec",
+    "mocha": "mocha test/**",
+    "cover": "istanbul cover _mocha test/** -- -R spec",
     "test": "npm run lint && npm run cover"
   },
   "keywords": [],

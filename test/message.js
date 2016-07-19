@@ -4,6 +4,7 @@ const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
 
+const ClientStatus = require('../utils/client-status');
 const keys = require('../keys');
 const User = require('../databases/').models.user;
 const app = require('../app');
@@ -11,10 +12,26 @@ const app = require('../app');
 describe('Test /api/messages', () => {
   before(() => {
     User.find({}).remove().exec();
+
+    const user = new User({
+      phone: {
+        region: keys.phone_region,
+        number: keys.phone_number
+      },
+      user: {
+        email: keys.user_email
+      },
+      message: {
+        code: keys.verification_code
+      },
+      verified: false
+    });
+
+    user.save();
   });
 
   context('POST', () => {
-    it('should create a new email verification code', function (done) {
+    it.skip('should create a new email verification code', function (done) {
       this.timeout(100000);
 
       const data = {
@@ -30,39 +47,39 @@ describe('Test /api/messages', () => {
 
       Request(app)
         .post('/api/messages')
-        .send({ data })
+        .send(data)
         .expect('content-type', /application\/json/)
         .expect(HttpStatus.CREATED, (err, res) => {
           if (err) {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.CREATED);
 
-          Expect(res.body).to.have.property('data')
-            .and.to.be.an('object');
+          Expect(res.body.server.message)
+            .to.be.equal('Created');
 
-          Expect(res.body.data).to.have.property('message')
-            .and.to.be.an('object');
+          Expect(res.body.client.status)
+            .to.be.equal(ClientStatus.MESSAGE_SENT);
 
-          Expect(res.body.data.message).to.have.property('code')
-            .and.to.be.a('string');
+          Expect(res.body.client.message)
+            .to.be.equal('Message Sent');
 
-          Expect(res.body.data.phone).to.have.property('region')
-            .and.to.be.equal(Number(data.phone.region));
+          Expect(res.body.data.user.email)
+            .to.be.equal(data.user.email);
 
-          Expect(res.body.data.phone).to.have.property('number')
-            .and.to.be.equal(Number(data.phone.number));
+          Expect(res.body.data.verified)
+            .to.be.equal(false);
 
-          Expect(res.body.data).to.have.property('user')
-            .and.to.be.an('object');
+          Expect(res.body.data.phone.region)
+            .to.be.equal(data.phone.region);
 
-          Expect(res.body.data.user).to.have.property('email')
-            .and.to.be.equal(data.user.email);
+          Expect(res.body.data.phone.number)
+            .to.be.equal(data.phone.number);
 
-          Expect(res.body.data).to.have.property('verified')
-            .and.to.be.equal(false);
+          Expect(res.body.data.message.code)
+            .to.be.equal(keys.verification_code);
 
           done();
         });
@@ -82,24 +99,18 @@ describe('Test /api/messages', () => {
       Request(app)
         .post('/api/messages')
         .set('Accept', 'text/html')
-        .send({ data })
+        .send(data)
         .expect('content-type', /application\/json/)
         .expect(HttpStatus.NOT_ACCEPTABLE, (err, res) => {
           if (err) {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.NOT_ACCEPTABLE);
 
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.NOT_ACCEPTABLE);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Not Acceptable');
+          Expect(res.body.server.message)
+            .to.be.equal('Not Acceptable');
 
           done();
         });
@@ -118,63 +129,24 @@ describe('Test /api/messages', () => {
 
       Request(app)
         .post('/api/messages')
-        .send({ data })
+        .send(data)
         .expect('content-type', /application\/json/)
         .expect(HttpStatus.BAD_REQUEST, (err, res) => {
           if (err) {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.BAD_REQUEST);
 
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
+          Expect(res.body.server.message)
+            .to.be.equal('Bad Request');
 
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.BAD_REQUEST);
+          Expect(res.body.client.status)
+            .to.be.equal(ClientStatus.INVALID_USER_INPUT);
 
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Bad Request');
-
-          done();
-        });
-    });
-
-    it('should fail to send the message', function (done) {
-      this.timeout(100000);
-
-      const data = {
-        phone: {
-          region: 111,
-          number: 10000000009621087445
-        },
-        user: {
-          email: 'starships@outlook.com'
-        }
-      };
-
-      Request(app)
-        .post('/api/messages')
-        .set('Accept', 'application/json')
-        .send({ data })
-        .expect('content-type', /application\/json/)
-        .expect(HttpStatus.BAD_REQUEST, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
-
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.BAD_REQUEST);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Bad Request');
+          Expect(res.body.client.message)
+            .to.be.equal('Invalid User Input');
 
           done();
         });
@@ -192,17 +164,11 @@ describe('Test /api/messages', () => {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.METHOD_NOT_ALLOWED);
 
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.METHOD_NOT_ALLOWED);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Method Not Allowed');
+          Expect(res.body.server.message)
+            .to.be.equal('Method Not Allowed');
 
           done();
         });
@@ -220,17 +186,11 @@ describe('Test /api/messages', () => {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.METHOD_NOT_ALLOWED);
 
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.METHOD_NOT_ALLOWED);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Method Not Allowed');
+          Expect(res.body.server.message)
+            .to.be.equal('Method Not Allowed');
 
           done();
         });
@@ -248,17 +208,11 @@ describe('Test /api/messages', () => {
             return done(err);
           }
 
-          Expect(res).to.have.property('body')
-            .and.to.be.an('object');
+          Expect(res.body.server.status)
+            .to.be.equal(HttpStatus.METHOD_NOT_ALLOWED);
 
-          Expect(res.body).to.have.property('error')
-            .and.to.be.an('object');
-
-          Expect(res.body.error).to.have.property('status')
-            .and.to.be.equal(HttpStatus.METHOD_NOT_ALLOWED);
-
-          Expect(res.body.error).to.have.property('message')
-            .and.to.be.equal('Method Not Allowed');
+          Expect(res.body.server.message)
+            .to.be.equal('Method Not Allowed');
 
           done();
         });
