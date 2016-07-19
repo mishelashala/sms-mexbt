@@ -32,10 +32,10 @@ Router
         if (!Valid.verification(data)) {
           Datadog.report('verify_message', 'invalid_user_input');
 
-          const responseObject = Response.create(
-            HttpStatus.BAD_REQUEST,
-            ClientStatus.INVALID_USER_INPUT
-          );
+          const responseObject = Response.create({
+            http: HttpStatus.BAD_REQUEST,
+            client: ClientStatus.INVALID_USER_INPUT
+          });
 
           return res
             .status(HttpStatus.BAD_REQUEST)
@@ -53,10 +53,10 @@ Router
             if (!_user) {
               Datadog.report('verify_message', 'invalid_user_email');
 
-              const responseObject = Response.create(
-                HttpStatus.BAD_REQUEST,
-                ClientStatus.USER_NOT_FOUND
-              );
+              const responseObject = Response.create({
+                http: HttpStatus.BAD_REQUEST,
+                client: ClientStatus.USER_NOT_FOUND
+              });
 
               return res
                 .status(HttpStatus.BAD_REQUEST)
@@ -66,10 +66,10 @@ Router
             if (_user.message.code !== data.message.code) {
               Datadog.report('verify_message', 'invalid_user_code');
 
-              const responseObject = Response.create(
-                HttpStatus.BAD_REQUEST,
-                ClientStatus.INVALID_VERIFICATION_CODE
-              );
+              const responseObject = Response.create({
+                http: HttpStatus.BAD_REQUEST,
+                client: ClientStatus.INVALID_VERIFICATION_CODE
+              });
 
               return res
                 .status(HttpStatus.BAD_REQUEST)
@@ -79,10 +79,10 @@ Router
             if (_user.verified === true) {
               Datadog.report('verify_message', 'user_already_verified');
 
-              const responseObject = Response.create(
-                HttpStatus.BAD_REQUEST,
-                ClientStatus.USER_ALREADY_VERIFIED
-              );
+              const responseObject = Response.create({
+                http: HttpStatus.BAD_REQUEST,
+                client: ClientStatus.USER_ALREADY_VERIFIED
+              });
 
               return res
                 .status(HttpStatus.BAD_REQUEST)
@@ -145,11 +145,11 @@ Router
                  */
 
                 if (response.data.isAccepted === true) {
-                  const responseObject = Response.create(
-                    HttpStatus.ACCEPTED,
-                    ClientStatus.USER_VERIFIED,
-                    _user
-                  );
+                  const responseObject = Response.create({
+                    http: HttpStatus.ACCEPTED,
+                    client: ClientStatus.USER_VERIFIED,
+                    data: _user
+                  });
 
                   return res
                     .status(HttpStatus.ACCEPTED)
@@ -186,10 +186,10 @@ Router
                     break;
                 }
 
-                const responseObject = Response.create(
-                  HttpStatus.INTERNAL_SERVER_ERROR,
-                  clientStatus
-                );
+                const responseObject = Response.create({
+                  http: HttpStatus.INTERNAL_SERVER_ERROR,
+                  client: clientStatus
+                });
 
                 res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -199,10 +199,10 @@ Router
           .catch(() => {
             Datadog.report('verify_message', 'error_database_connection');
 
-            const responseObject = Response.create(
-              HttpStatus.INTERNAL_SERVER_ERROR,
-              ClientStatus.DATABASE_CONNECTION_FAILED
-            );
+            const responseObject = Response.create({
+              http: HttpStatus.INTERNAL_SERVER_ERROR,
+              client: ClientStatus.DATABASE_CONNECTION_FAILED
+            });
 
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -218,9 +218,9 @@ Router
       default () {
         Datadog.report('verify_message', 'bad_content_negotiation');
 
-        const responseObject = Response.create(
-          HttpStatus.NOT_ACCEPTABLE
-        );
+        const responseObject = Response.create({
+          http: HttpStatus.NOT_ACCEPTABLE
+        });
 
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
@@ -236,9 +236,9 @@ Router
   .get('/', (req, res) => {
     Datadog.report('verify_message', 'method_not_allowed');
 
-    const responseObject = Response.create(
-      HttpStatus.METHOD_NOT_ALLOWED
-    );
+    const responseObject = Response.create({
+      http: HttpStatus.METHOD_NOT_ALLOWED
+    });
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
@@ -248,9 +248,9 @@ Router
   .put('/', (req, res) => {
     Datadog.report('verify_message', 'method_not_allowed');
 
-    const responseObject = Response.create(
-      HttpStatus.METHOD_NOT_ALLOWED
-    );
+    const responseObject = Response.create({
+      http: HttpStatus.METHOD_NOT_ALLOWED
+    });
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
@@ -260,9 +260,9 @@ Router
   .delete('/', (req, res) => {
     Datadog.report('verify_message', 'method_not_allowed');
 
-    const responseObject = Response.create(
-      HttpStatus.METHOD_NOT_ALLOWED
-    );
+    const responseObject = Response.create({
+      http: HttpStatus.METHOD_NOT_ALLOWED
+    });
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)

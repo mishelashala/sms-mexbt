@@ -3,17 +3,10 @@
 const HttpStatus = require('http-status');
 const ClientStatus = require('../client-status');
 
-const create = (httpCode, clientCode, data) => {
+const create = ({ http, client, data }) => {
   const response = {};
 
-  switch (httpCode) {
-    case HttpStatus.OK:
-      response.server = {
-        status: HttpStatus.OK,
-        message: 'OK'
-      };
-      break;
-
+  switch (http) {
     case HttpStatus.CREATED:
       response.server = {
         status: HttpStatus.CREATED,
@@ -64,7 +57,7 @@ const create = (httpCode, clientCode, data) => {
       break;
   }
 
-  switch (clientCode) {
+  switch (client) {
     case ClientStatus.MESSAGE_SENT:
       response.client = {
         status: ClientStatus.MESSAGE_SENT,
