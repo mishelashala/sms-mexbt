@@ -6,10 +6,10 @@ const Schema = Mongoose.Schema;
 const UserSchema = new Schema({
   phone: {
     region: {
-      type: Number
+      type: String
     },
     number: {
-      type: Number
+      type: String
     }
   },
   user: {

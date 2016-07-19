@@ -3,10 +3,10 @@
 const Expect = require('chai').expect;
 
 const keys = require('../keys');
-const validData = require('../utils').validData;
+const Valid = require('../utils/valid');
 
-describe('utilities', () => {
-  context('#validData', () => {
+describe('Utils', () => {
+  context('valid #message', () => {
     it('should pass valid data', () => {
       const data = {
         phone: {
@@ -18,7 +18,64 @@ describe('utilities', () => {
         }
       };
 
-      Expect(validData(data)).to.be.equal(true);
+      Expect(Valid.message(data)).to.be.equal(true);
+    });
+  });
+
+  context('valid #verification', () => {
+    it('should return false if message property is not present', () => {
+      const data = {
+        user: {
+          email: keys.user_email
+        }
+      };
+
+      Expect(Valid.verification(data)).to.be.equal(false);
+    });
+
+    it('should return false if message.code property is not present', () => {
+      const data = {
+        message: {},
+        user: {
+          email: keys.user_email
+        }
+      };
+
+      Expect(Valid.verification(data)).to.be.equal(false);
+    });
+
+    it('should return false if user property is not present', () => {
+      const data = {
+        message: {
+          code: keys.verification_code
+        }
+      };
+
+      Expect(Valid.verification(data)).to.be.equal(false);
+    });
+
+    it('should return false if user.code property is not present', () => {
+      const data = {
+        message: {
+          code: keys.verification_code
+        },
+        user: {}
+      };
+
+      Expect(Valid.verification(data)).to.be.equal(false);
+    });
+
+    it('should return false if message.code.length is not 6', () => {
+      const data = {
+        message: {
+          code: '123456777'
+        },
+        user: {
+          email: keys.user_email
+        }
+      };
+
+      Expect(Valid.verification(data)).to.be.equal(false);
     });
   });
 });

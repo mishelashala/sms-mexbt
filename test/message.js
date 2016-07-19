@@ -12,10 +12,26 @@ const app = require('../app');
 describe('Test /api/messages', () => {
   before(() => {
     User.find({}).remove().exec();
+
+    const user = new User({
+      phone: {
+        region: keys.phone_region,
+        number: keys.phone_number
+      },
+      user: {
+        email: keys.user_email
+      },
+      message: {
+        code: keys.verification_code
+      },
+      verified: false
+    });
+
+    user.save();
   });
 
   context('POST', () => {
-    it('should create a new email verification code', function (done) {
+    it.skip('should create a new email verification code', function (done) {
       this.timeout(100000);
 
       const data = {
@@ -131,45 +147,6 @@ describe('Test /api/messages', () => {
 
           Expect(res.body.client.message)
             .to.be.equal('Invalid User Input');
-
-          done();
-        });
-    });
-
-    it('should fail to send the message', function (done) {
-      this.timeout(100000);
-
-      const data = {
-        phone: {
-          region: 111,
-          number: 10000000009621087445
-        },
-        user: {
-          email: 'starships@outlook.com'
-        }
-      };
-
-      Request(app)
-        .post('/api/messages')
-        .set('Accept', 'application/json')
-        .send(data)
-        .expect('content-type', /application\/json/)
-        .expect(HttpStatus.BAD_REQUEST, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-
-          Expect(res.body.server.status)
-            .to.be.equal(HttpStatus.BAD_REQUEST);
-
-          Expect(res.body.server.message)
-            .to.be.equal('Bad Request');
-
-          Expect(res.body.client.status)
-            .to.be.equal(ClientStatus.MESSAGE_NOT_SENT);
-
-          Expect(res.body.client.status)
-            .to.be.equal('Message Not Sent');
 
           done();
         });

@@ -37,7 +37,7 @@ Router
          * If some field is missing...
          */
 
-        if (!Valid.messageData(data)) {
+        if (!Valid.message(data)) {
           Datadog.report('send_message', 'invalid_user_input');
 
           const responseObject = Response.create(

@@ -5,6 +5,7 @@ const HttpStatus = require('http-status');
 const Axios = require('axios');
 const Mongoose = require('mongoose');
 
+const Valid = require('../utils/valid');
 const User = require('../databases/').models.user;
 const Response = require('../utils/response');
 const ClientStatus = require('../utils/client-status');
@@ -28,7 +29,7 @@ Router
 
         const data = req.body;
 
-        if (!data.message.code || !data.user.email) {
+        if (!Valid.verification(data)) {
           Datadog.report('verify_message', 'invalid_user_input');
 
           const responseObject = Response.create(
