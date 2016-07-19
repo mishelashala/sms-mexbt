@@ -1,18 +1,31 @@
 'use strict';
 
 const message = (data) => {
-  return (
-    !!String(data.phone.number) !== false &&
-    !!String(data.phone.region) !== false &&
-    data.phone.number.length === 10 &&
-    !!String(data.user.email) !== false &&
-    data.user.email !== null &&
-    data.phone.region !== null &&
-    data.phone.number !== null &&
-    data.user.email !== undefined &&
-    data.phone.number !== undefined &&
-    data.phone.region !== undefined
-  );
+  if (data.phone === undefined) {
+    return false;
+  }
+
+  if (data.phone.number === undefined) {
+    return false;
+  }
+
+  if (data.phone.region === undefined) {
+    return false;
+  }
+
+  if (data.phone.number.length !== 10) {
+    return false;
+  }
+
+  if (data.user === undefined) {
+    return false;
+  }
+
+  if (data.user.email === undefined) {
+    return false;
+  }
+
+  return true;
 };
 
 const verification = (data) => {

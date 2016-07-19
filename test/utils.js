@@ -7,7 +7,7 @@ const Valid = require('../utils/valid');
 
 describe('Utils', () => {
   context('valid #message', () => {
-    it('should pass valid data', () => {
+    it('should return true if data is valid', () => {
       const data = {
         phone: {
           region: keys.phone_region,
@@ -19,6 +19,65 @@ describe('Utils', () => {
       };
 
       Expect(Valid.message(data)).to.be.equal(true);
+    });
+
+    it('should return false if phone property is not present', () => {
+      const data = {
+        user: {
+          email: keys.user_email
+        }
+      };
+
+      Expect(Valid.message(data)).to.be.equal(false);
+    });
+
+    it('should return false if phone.region property is not present', () => {
+      const data = {
+        phone: {
+          number: keys.phone_number
+        },
+        user: {
+          email: keys.user_email
+        }
+      };
+
+      Expect(Valid.message(data)).to.be.equal(false);
+    });
+
+    it('should return false if phone.number property is not present', () => {
+      const data = {
+        phone: {
+          region: keys.phone_region
+        },
+        user: {
+          email: keys.user_email
+        }
+      };
+
+      Expect(Valid.message(data)).to.be.equal(false);
+    });
+
+    it('should return false if user property is not present', () => {
+      const data = {
+        phone: {
+          region: keys.phone_region,
+          number: keys.phone_number
+        }
+      };
+
+      Expect(Valid.message(data)).to.be.equal(false);
+    });
+
+    it('should return false if user.email is not present', () => {
+      const data = {
+        phone: {
+          region: keys.phone_region,
+          number: keys.phone_number
+        },
+        user: {}
+      };
+
+      Expect(Valid.message(data)).to.be.equal(false);
     });
   });
 
