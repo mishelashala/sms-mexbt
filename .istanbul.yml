@@ -1,0 +1,2 @@
+instrumentation:
+  excludes: ['**/keys.js', '**/utils/datadog/index.js']

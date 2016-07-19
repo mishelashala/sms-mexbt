@@ -36,7 +36,7 @@ app.use('/api/verify', verifyRoute);
 app.use((req, res) => {
   res
     .status(HttpStatus.NOT_FOUND)
-    .json(Response.create(HttpStatus.NOT_FOUND));
+    .json(Response.create({ http: HttpStatus.NOT_FOUND }));
 });
 
 module.exports = app;

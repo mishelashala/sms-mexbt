@@ -1,23 +1,30 @@
 'use strict';
 
 const HttpStatus = require('http-status');
-const ClientStatus = require('./client-status');
+const ClientStatus = require('../client-status');
 
-const create = (httpCode, clientCode, data) => {
+const create = ({ http, client, data }) => {
   const response = {};
 
-  switch (httpCode) {
-    case HttpStatus.OK:
-      response.server = {
-        status: HttpStatus.OK,
-        message: 'OK'
-      };
-      break;
-
+  switch (http) {
     case HttpStatus.CREATED:
       response.server = {
         status: HttpStatus.CREATED,
         message: 'Created'
+      };
+      break;
+
+    case HttpStatus.ACCEPTED:
+      response.server = {
+        status: HttpStatus.ACCEPTED,
+        message: 'Accepted'
+      };
+      break;
+
+    case HttpStatus.BAD_REQUEST:
+      response.server = {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'Bad Request'
       };
       break;
 
@@ -35,18 +42,22 @@ const create = (httpCode, clientCode, data) => {
       };
       break;
 
+    case HttpStatus.NOT_FOUND:
+      response.server = {
+        status: HttpStatus.NOT_FOUND,
+        message: 'Not Found'
+      };
+      break;
+
     case HttpStatus.INTERNAL_SERVER_ERROR:
       response.server = {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal Server Error'
       };
       break;
-
-    default:
-      break;
   }
 
-  switch (clientCode) {
+  switch (client) {
     case ClientStatus.MESSAGE_SENT:
       response.client = {
         status: ClientStatus.MESSAGE_SENT,
@@ -61,24 +72,17 @@ const create = (httpCode, clientCode, data) => {
       };
       break;
 
-    case ClientStatus.EMAIL_EMPTY:
-      response.client = {
-        status: ClientStatus.EMAIL_EMPTY,
-        message: 'User Error: Email cannot be empty'
-      };
-      break;
-
-    case ClientStatus.CODE_EMPTY:
-      response.client = {
-        status: ClientStatus.CODE_EMPTY,
-        message: 'User Error: Code cannot be empty'
-      };
-      break;
-
     case ClientStatus.USER_VERIFIED:
       response.client = {
         status: ClientStatus.USER_VERIFIED,
         message: 'User Verified'
+      };
+      break;
+
+    case ClientStatus.USER_NOT_FOUND:
+      response.client = {
+        status: ClientStatus.USER_NOT_FOUND,
+        message: 'User Not Found'
       };
       break;
 
@@ -122,9 +126,6 @@ const create = (httpCode, clientCode, data) => {
         status: ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL,
         message: 'Cannot Change Verification Level'
       };
-      break;
-
-    default:
       break;
   }
 

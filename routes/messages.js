@@ -37,13 +37,13 @@ Router
          * If some field is missing...
          */
 
-        if (!Valid.messageData(data)) {
+        if (!Valid.message(data)) {
           Datadog.report('send_message', 'invalid_user_input');
 
-          const responseObject = Response.create(
-            HttpStatus.BAD_REQUEST,
-            ClientStatus.INVALID_USER_INPUT
-          );
+          const responseObject = Response.create({
+            http: HttpStatus.BAD_REQUEST,
+            client: ClientStatus.INVALID_USER_INPUT
+          });
 
           return res
             .status(HttpStatus.BAD_REQUEST)
@@ -83,10 +83,10 @@ Router
               if (err) {
                 Datadog.report('send_message', 'error_sending_sms');
 
-                const responseObject = Response.create(
-                  HttpStatus.INTERNAL_SERVER_ERROR,
-                  ClientStatus.MESSAGE_NOT_SENT
-                );
+                const responseObject = Response.create({
+                  http: HttpStatus.INTERNAL_SERVER_ERROR,
+                  client: ClientStatus.MESSAGE_NOT_SENT
+                });
 
                 return res
                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -113,11 +113,11 @@ Router
                 .then((doc) => {
                   Datadog.report('send_message', 'message_database_saved');
 
-                  const responseObject = Response.create(
-                    HttpStatus.CREATED,
-                    ClientStatus.MESSAGE_SENT,
-                    _user
-                  );
+                  const responseObject = Response.create({
+                    http: HttpStatus.CREATED,
+                    client: ClientStatus.MESSAGE_SENT,
+                    data: _user
+                  });
 
                   res
                     .status(HttpStatus.CREATED)
@@ -126,10 +126,10 @@ Router
                 .error(() => {
                   Datadog.report('send_message', 'error_database_registering_user');
 
-                  const responseObject = Response.create(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    ClientStatus.MESSAGE_NOT_SENT
-                  );
+                  const responseObject = Response.create({
+                    http: HttpStatus.INTERNAL_SERVER_ERROR,
+                    client: ClientStatus.MESSAGE_NOT_SENT
+                  });
 
                   res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -140,10 +140,10 @@ Router
           .catch(() => {
             Datadog.report('send_message', 'error_database_connection');
 
-            const responseObject = Response.create(
-              HttpStatus.INTERNAL_SERVER_ERROR,
-              ClientStatus.DATABASE_CONNECTION_FAILED
-            );
+            const responseObject = Response.create({
+              http: HttpStatus.INTERNAL_SERVER_ERROR,
+              client: ClientStatus.DATABASE_CONNECTION_FAILED
+            });
 
             res
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -159,9 +159,9 @@ Router
       default () {
         Datadog.report('send_message', 'bad_content_negotiation');
 
-        const responseObject = Response.create(
-          HttpStatus.NOT_ACCEPTABLE
-        );
+        const responseObject = Response.create({
+          http: HttpStatus.NOT_ACCEPTABLE
+        });
 
         res
           .status(HttpStatus.NOT_ACCEPTABLE)
@@ -177,9 +177,9 @@ Router
   .get('/', (req, res) => {
     Datadog.report('send_message', 'method_not_allowed');
 
-    const responseObject = Response.create(
-      HttpStatus.METHOD_NOT_ALLOWED
-    );
+    const responseObject = Response.create({
+      http: HttpStatus.METHOD_NOT_ALLOWED
+    });
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
@@ -189,9 +189,9 @@ Router
   .put('/', (req, res) => {
     Datadog.report('send_message', 'method_not_allowed');
 
-    const responseObject = Response.create(
-      HttpStatus.METHOD_NOT_ALLOWED
-    );
+    const responseObject = Response.create({
+      http: HttpStatus.METHOD_NOT_ALLOWED
+    });
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)
@@ -201,9 +201,9 @@ Router
   .delete('/', (req, res) => {
     Datadog.report('send_message', 'method_not_allowed');
 
-    const responseObject = Response.create(
-      HttpStatus.METHOD_NOT_ALLOWED
-    );
+    const responseObject = Response.create({
+      http: HttpStatus.METHOD_NOT_ALLOWED
+    });
 
     res
       .status(HttpStatus.METHOD_NOT_ALLOWED)

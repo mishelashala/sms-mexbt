@@ -10,7 +10,9 @@ const app = require('../app');
 
 describe('Test /api/verify', () => {
   context('POST', () => {
-    it('should verify an email account', (done) => {
+    it('should verify an email account', function (done) {
+      this.timeout(100000000);
+
       const data = {
         user: {
           email: keys.user_email
@@ -42,7 +44,7 @@ describe('Test /api/verify', () => {
             .to.be.equal('User Verified');
 
           Expect(res.body.data.user.email)
-            .to.be.equal(data.user.email);
+            .to.be.equal(keys.user_email);
 
           Expect(res.body.data.message.code)
             .to.be.equal(keys.verification_code);
@@ -51,10 +53,10 @@ describe('Test /api/verify', () => {
             .to.be.equal(true);
 
           Expect(res.body.data.phone.number)
-            .to.be.equal(data.phone.number);
+            .to.be.equal(keys.phone_number);
 
           Expect(res.body.data.phone.region)
-            .to.be.equal(data.phone.region);
+            .to.be.equal(keys.phone_region);
 
           done();
         });
@@ -82,18 +84,12 @@ describe('Test /api/verify', () => {
 
     it('should send incomplete data', (done) => {
       const data = {
-        user: {
-          email: keys.user_email
-        },
-        message: {
-          code: ''
-        }
       };
 
       Request(app)
         .post('/api/verify')
         .set('Accept', 'application/json')
-        .send(({ data }))
+        .send(data)
         .expect('content-type', /application\/json/)
         .expect(HttpStatus.BAD_REQUEST, (err, res) => {
           if (err) {
@@ -160,7 +156,7 @@ describe('Test /api/verify', () => {
           email: keys.user_email
         },
         message: {
-          code: String(231456677777)
+          code: '123457'
         }
       };
 
@@ -260,10 +256,10 @@ describe('Test /api/message', () => {
     it('should try to verify a verified account', (done) => {
       const data = {
         user: {
-          email: 'starships@outlook.com'
+          email: keys.user_email
         },
         message: {
-          code: process.env.TEST_VERIFY_CODE
+          code: keys.verification_code
         }
       };
 

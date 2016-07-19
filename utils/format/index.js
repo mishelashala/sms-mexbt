@@ -2,7 +2,7 @@
 
 const Cuid = require('cuid');
 
-const keys = require('../keys');
+const keys = require('../../keys');
 
 /*!
  * Takes the body and format its data
@@ -10,7 +10,7 @@ const keys = require('../keys');
  * @return {Object} - Data formated
  */
 
-const messageData = (body) => {
+const message = (body) => {
   return {
     phone: {
       region: body.phone.region,
@@ -25,4 +25,4 @@ const messageData = (body) => {
   };
 };
 
-module.exports = { messageData };
+module.exports = { message };
