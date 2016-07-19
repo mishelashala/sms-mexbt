@@ -8,9 +8,10 @@ const Mongoose = require('mongoose');
 const Response = require('../utils/response');
 const ClientStatus = require('../utils/client-status');
 const keys = require('../keys');
-const Utils = require('../utils');
 const User = require('../databases/').models.user;
 const Datadog = require('../utils/datadog');
+const Format = require('../utils/format');
+const Valid = require('../utils/valid');
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
@@ -30,13 +31,13 @@ Router
          * and return a formated object
          */
 
-        const data = Utils.createVerificationData(req.body);
+        const data = Format.message(req.body);
 
         /*!
          * If some field is missing...
          */
 
-        if (!Utils.validData(data)) {
+        if (!Valid.messageData(data)) {
           Datadog.report('send_message', 'invalid_user_input');
 
           const responseObject = Response.create(
