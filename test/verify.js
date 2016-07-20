@@ -4,7 +4,7 @@ const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
 
-const ClientStatus = require('../utils/client-status');
+const ClientStatus = require('../utils/client/status');
 const keys = require('../keys');
 const app = require('../app');
 
@@ -57,12 +57,6 @@ describe('Test /api/verify', () => {
 
           Expect(res.body.data.phone.region)
             .to.be.equal(keys.phone_region);
-
-          Expect(res.body.status).to.have.property('code')
-            .and.to.be.equal(HttpStatus.ACCEPTED);
-
-          Expect(res.body.status).to.have.property('message')
-            .and.to.be.equal('Accepted');
 
           done();
         });

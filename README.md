@@ -1,104 +1,363 @@
-# Email verfication - Twilio microservice
+# API Contract
 
-[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
-![travis-ci](https://travis-ci.com/mishelashala/twilio-microservice.svg?token=WCBiHXcfLbDzxM7ZVczp&branch=master)
+**Index**:  
+1. [Usage](#usage)
+  - [POST /api/messages](#post-api-messages)
+  - [POST /api/verify](#post-api-verify)
+2. [Error Handling](#error-handling)
+  - [Invalid User Input](#invalid-user-input)
+  - [Email To Verify Not Found](#email-to-verify-not-found)
+  - [Invalid Verification Code](#invalid-verification-code)
+  - [User Already Verified](#user-already-verified)
+  - [Database Connection Failed](#database-connection-failed)
+  - [Cannot Auth To alphapoint](#cannot-auth-to-alphapoint)
+  - [Cannot Change Verification Level](#cannot-change-verification-level)
+  - [Wrong Accept Header](#wrong-accept-header)
+  - [Method Not Allowed](#method-not-allowed)
+  - [Not Found](#not-found)
 
-## Index
+## <a name='usage'>Usage</a>
+### <a name='post-api-messages'>POST /api/messages</a>
+It creates a new verification message.
 
-### Instalation
-
+#### Request
+**headers**:
 ```
-$ git clone git@bitbucket.org:mexbtcore/twilio-email-verification.git
-$ cd twilio-email-verification
-$ npm install
-$ NODE_ENV=production node bin/www
+Accept: application/json
 ```
-
-### Seting Up Enviroment
-
-#### Global
-Save this in env var in `~/.bashrc` file (this independient of the enviroment).
-**Twilio:**
+**body**:
 ```
-export TWILIO_ACCOUNT_SID = ...
-export TWILIO_PHONE_NUMBER = ...
-export TWILIO_AUTH_TOKEN = ...
-```
-
-#### Production
-Save this env vars in `~/.bashrc` file  
-
-```
-NODE_ENV=production
-```
-
-
-**Database:**
-```
-export PROD_DB_USER = ...
-export PROD_DB_PASS = ...
-export PROD_DB_HOST = ...
-export PROD_DB_PORT = ...
-export PROD_DB_NAME = ...
+{
+    "phone": {
+        "region": 01,
+        "number": 5555555555
+    },
+    "user": {
+        "email": "example@domain.com"
+    }
+}
 ```
 
-#### Staging
-Save this env vars in `~/.bashrc` file  
-
+#### Response
+**Headers**:
 ```
-NODE_ENV=staging
+Content-Type: application/json
+Status: 201 Created
 ```
-
-**Database:**
+**Body**:
 ```
-export STAG_DB_USER = ...
-export STAG_DB_PASS = ...
-export STAG_DB_HOST = ...
-export STAG_DB_PORT = ...
-export STAG_DB_NAME = ...
-```
-
-#### Development (local) and testing
-Save this env vars in `~/.bashrc` file  
-
-**Database:**
-```
-export DEV_DB_USER = ...
-export DEV_DB_PASS = ...
-export DEV_DB_HOST = ...
-export DEV_DB_PORT = ...
-export DEV_DB_NAME = ...
-
-export DEV_PHONE_REGION = ...
-export DEV_PHONE_NUMBER = ...
-
-export DEV_VERIFICATION_CODE = ...
-
-export DEV_USER_EMAIL = ...
+{
+    "server": {
+        "status": 201,
+        "message": "Created"
+    },
+    "client": {
+        "status": 10,
+        "status": "Message Sent"
+    },
+    "data": {
+        "verified": false,
+        "message": {
+            "code": "abcdef" // len(6)
+        },
+        "phone": {
+            "region": 01,
+            "number": 5555555555
+        },
+        "user": {
+            "email": "example@domain.com"
+        }
+    }
+}
 ```
 
-## Testing the project
+### <a name='post-api-verify'>POST /api/verify</a>
 
-### Local
+It verifies a user.
+
+#### Request
+**Headers**:
 ```
-$ npm test
+Accept: application/json
 ```
 
-This command will run two different tasks.  
-The first one is `lint`, which will review the coding style
-([semistandard](https://www.npmjs.com/package/semistandard)).
-The second one is `cover`, which will make a code coverage analysis
-([istanbul](https://www.npmjs.com/package/istanbul)) and will run all the
-tests ([mocha](https://www.npmjs.com/package/mocha)) at the same time.
+**Body**:
+```
+{
+    "user": {
+        "email": "example@domain.com"
+    },
+    "message": {
+        "code": "abcdef" // len(6)
+    }
+}
+```
 
-`cover` creates a directory called `coverage` in which you can see all the
-analysis.
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 202 Accepted
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 202,
+        "message": "Accepted"
+    },
+    "client": {
+        "status": 11,
+        "message": "User Verified"
+    },
+    "data": {
+        "user": {
+            "email": "starships@outlook.com"
+        },
+        "message": {
+            "code": "abcdef"
+        },
+        "verified": true,
+        "phone": {
+            "region": 01,
+            "number": 5555555555
+        }
+    }
+}
+```
 
-### Remote
-Every time you make a push to origin travis-ci will run the tests.
+## <a name='error-handling'>Error Handling</a>
 
-## API
-Read the CONTRACT.md file
+### <a name='invalid-user-input'>Invalid User Input</a>
 
-## Technical Debt
-Read the DEBT.md file
+If you try to submit invalid (blank or not corresponding to the model) data.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 400 Bad Request
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 400,
+        "message": "Bad Request"
+    },
+    "client": {
+        "status": 20,
+        "message": "Invalid User Input"
+    }
+}
+```
+
+### <a name='email-to-verify-not-found'>Email To Verify Not Found</a>
+
+If the user has not receive a verification mesage and is trying to "verify" his account.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 400 Bad Request
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 400,
+        "message": "Bad Request"
+    },
+    "client": {
+        "status": 23,
+        "message": "User Not Found"
+    }
+}
+```
+
+### <a name='invalid-verification-code'>Invalid Verification Code</a>
+
+If the verification code is wrong.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 400 Bad Request
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 400,
+        "message": "Bad Request"
+    },
+    "client": {
+        "status": 24,
+        "message": "Invalid Verification Code"
+    }
+}
+```
+
+### <a name='user-already-verified'>User Already Verified</a>
+
+If you try to verify an already verified user.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 400 Bad Request
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 400,
+        "message": "Bad Request"
+    },
+    "client": {
+        "status": 25,
+        "message": "User Already Verified"
+    }
+}
+```
+
+### <a name='database-connection-failed'>Database Connection Failed</a>
+
+If something went wrong during the db connection.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 500 Internal Server Error
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 500,
+        "message": "Internal Server Error"
+    },
+    "client": {
+        "status": 31,
+        "message": "Database Connection Failed"
+    }
+}
+```
+
+### <a name='cannot-auth-to-alphapoint'>Cannot Auth To Alphapoint</a>
+
+If the service could not auth with alphapoint.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 500 Internal Server Error
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 500,
+        "message": "Internal Server Error"
+    },
+    "client": {
+        "status": 40,
+        "message": "Cannot Auth To Alphapoint"
+    }
+}
+```
+
+### <a name='cannot-change-verification-level'>Cannot Change Verification Level</a>
+
+If the service could not change the verification level of the user (alphapoint).
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 500 Internal Server Error
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 500,
+        "message": "Internal Server Error"
+    },
+    "client": {
+        "status": 41,
+        "message": "Cannot Change Verification Level"
+    }
+}
+```
+
+### <a name='wrong-accept-header'>Wrong Accept Header</a>
+
+If the `Accept` header is different from `application/json`.
+
+#### Request
+**Headers**:
+```
+Accept: text/html
+```
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 406 Not Acceptable
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 406,
+        "message": "Not Acceptable"
+    }
+}
+```
+
+### <a name='method-not-allowed'>Method Not Allowed</a>
+
+Only `POST` method allowed.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 405 Method Not Allowed
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 405,
+        "message": "Method Not Allowed"
+    }
+}
+```
+
+### <a name='not-found'>Not Found</a>
+
+Only `/api/messages` and `/api/verify/` routes allowed.
+
+#### Response
+**Headers**:
+```
+Content-Type: application/json
+Status: 404 Not Found
+```
+**Body**:
+```
+{
+    "server": {
+        "status": 404,
+        "message": "Not Found"
+    }
+}
+```
