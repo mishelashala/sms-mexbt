@@ -13,36 +13,25 @@ describe('Test /api/messages', () => {
   before(() => {
     User.find({}).remove().exec();
 
+    /*
     const user = new User({
-      phone: {
-        region: keys.phone_region,
-        number: keys.phone_number
-      },
-      user: {
-        email: keys.user_email
-      },
-      message: {
-        code: keys.verification_code
-      },
+      phone: `${keys.phone_region}${keys.phone_number}`,
+      email: keys.user_email,
+      code: keys.verification_code,
       verified: false
     });
 
     user.save();
+    */
   });
 
   context('POST', () => {
-    it.skip('should create a new email verification code', function (done) {
+    it('should create a new email verification code', function (done) {
       this.timeout(100000);
 
       const data = {
-        phone: {
-          region: keys.phone_region,
-          number: keys.phone_number
-        },
-        user: {
-          email: keys.user_email
-        },
-        verified: false
+        phone: `${keys.phone_region}${keys.phone_number}`,
+        email: `${keys.user_email}`
       };
 
       Request(app)
@@ -66,20 +55,23 @@ describe('Test /api/messages', () => {
           Expect(res.body.client.message)
             .to.be.equal('Message Sent');
 
-          Expect(res.body.data.user.email)
-            .to.be.equal(data.user.email);
+          Expect(res.body.data.email)
+            .to.be.equal(data.email);
 
           Expect(res.body.data.verified)
             .to.be.equal(false);
 
-          Expect(res.body.data.phone.region)
-            .to.be.equal(data.phone.region);
+          Expect(res.body.data.phone)
+            .to.be.equal(data.phone);
 
-          Expect(res.body.data.phone.number)
-            .to.be.equal(data.phone.number);
-
-          Expect(res.body.data.message.code)
+          Expect(res.body.data.code)
             .to.be.equal(keys.verification_code);
+
+          Expect(res.body.data.verified)
+            .to.be.equal(false);
+
+          Expect(res.body.data.created_at)
+            .to.be.a('string');
 
           done();
         });
@@ -87,13 +79,8 @@ describe('Test /api/messages', () => {
 
     it('should send the wrong Accept header', (done) => {
       const data = {
-        phone: {
-          region: keys.phone_number,
-          number: keys.phone_region
-        },
-        user: {
-          email: keys.user_email
-        }
+        phone: `${keys.phone_region}${keys.phone_number}`,
+        email: `${keys.user_email}`
       };
 
       Request(app)
@@ -118,13 +105,8 @@ describe('Test /api/messages', () => {
 
     it('should send incomplete data', (done) => {
       const data = {
-        phone: {
-          region: '',
-          number: ''
-        },
-        user: {
-          email: ''
-        }
+        phone: '',
+        email: ''
       };
 
       Request(app)

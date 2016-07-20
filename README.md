@@ -2,19 +2,21 @@
 
 **Index**:  
 1. [Usage](#usage)
-  - [POST /api/messages](#post-api-messages)
-  - [POST /api/verify](#post-api-verify)
+- [POST /api/messages](#post-api-messages)
+- [POST /api/verify](#post-api-verify)
+
+
 2. [Error Handling](#error-handling)
-  - [Invalid User Input](#invalid-user-input)
-  - [Email To Verify Not Found](#email-to-verify-not-found)
-  - [Invalid Verification Code](#invalid-verification-code)
-  - [User Already Verified](#user-already-verified)
-  - [Database Connection Failed](#database-connection-failed)
-  - [Cannot Auth To alphapoint](#cannot-auth-to-alphapoint)
-  - [Cannot Change Verification Level](#cannot-change-verification-level)
-  - [Wrong Accept Header](#wrong-accept-header)
-  - [Method Not Allowed](#method-not-allowed)
-  - [Not Found](#not-found)
+- [Invalid User Input](#invalid-user-input)
+- [Email To Verify Not Found](#email-to-verify-not-found)
+- [Invalid Verification Code](#invalid-verification-code)
+- [User Already Verified](#user-already-verified)
+- [Database Connection Failed](#database-connection-failed)
+- [Cannot Auth To alphapoint](#cannot-auth-to-alphapoint)
+- [Cannot Change Verification Level](#cannot-change-verification-level)
+- [Wrong Accept Header](#wrong-accept-header)
+- [Method Not Allowed](#method-not-allowed)
+- [Not Found](#not-found)
 
 ## <a name='usage'>Usage</a>
 ### <a name='post-api-messages'>POST /api/messages</a>
@@ -28,13 +30,8 @@ Accept: application/json
 **body**:
 ```
 {
-    "phone": {
-        "region": 01,
-        "number": 5555555555
-    },
-    "user": {
-        "email": "example@domain.com"
-    }
+    "phone": 015555555555
+    "email": "example@domain.com"
 }
 ```
 
@@ -56,17 +53,11 @@ Status: 201 Created
         "status": "Message Sent"
     },
     "data": {
+        "_id": "507f1f77bcf86cd799439011"
+        "created_at": "2016-05-18T16:00:00Z"
         "verified": false,
-        "message": {
-            "code": "abcdef" // len(6)
-        },
-        "phone": {
-            "region": 01,
-            "number": 5555555555
-        },
-        "user": {
-            "email": "example@domain.com"
-        }
+        "phone": "015555555555",
+        "email": "example@domain.com"
     }
 }
 ```
@@ -84,12 +75,8 @@ Accept: application/json
 **Body**:
 ```
 {
-    "user": {
-        "email": "example@domain.com"
-    },
-    "message": {
-        "code": "abcdef" // len(6)
-    }
+    "email": "example@domain.com",
+    "code": "abcdef" // len(6)
 }
 ```
 
@@ -111,17 +98,13 @@ Status: 202 Accepted
         "message": "User Verified"
     },
     "data": {
-        "user": {
-            "email": "starships@outlook.com"
-        },
-        "message": {
-            "code": "abcdef"
-        },
+        "_id": "507f1f77bcf86cd799439011",
+        "created_at": "2016-05-18T16:00:00Z",
+        "updated_at": "2016-05-18T16:01:00Z",
+        "email": "starships@outlook.com",
+        "phone": "015555555555",
+        "code": "abcdef",
         "verified": true,
-        "phone": {
-            "region": 01,
-            "number": 5555555555
-        }
     }
 }
 ```
