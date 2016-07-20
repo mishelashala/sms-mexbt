@@ -14,23 +14,19 @@ describe('Test /api/verify', () => {
       this.timeout(100000000);
 
       const data = {
-        user: {
-          email: keys.user_email
-        },
-        message: {
-          code: keys.verification_code
-        }
+        email: keys.user_email,
+        code: keys.verification_code
       };
 
       Request(app)
         .post('/api/verify')
         .send(data)
-        .expect('content-type', /application\/json/)
-        .expect(HttpStatus.ACCEPTED, (err, res) => {
+        .expect('content-type', /application\/json/, (err, res) => {
           if (err) {
             return done(err);
           }
 
+          //console.log(res.body);
           Expect(res.body.server.status)
             .to.be.equal(HttpStatus.ACCEPTED);
 
@@ -43,20 +39,23 @@ describe('Test /api/verify', () => {
           Expect(res.body.client.message)
             .to.be.equal('User Verified');
 
-          Expect(res.body.data.user.email)
+          Expect(res.body.data.email)
             .to.be.equal(keys.user_email);
 
-          Expect(res.body.data.message.code)
+          Expect(res.body.data.code)
             .to.be.equal(keys.verification_code);
 
           Expect(res.body.data.verified)
             .to.be.equal(true);
 
-          Expect(res.body.data.phone.number)
-            .to.be.equal(keys.phone_number);
+          Expect(res.body.data.phone)
+            .to.be.equal(`${keys.phone_region}${keys.phone_number}`);
 
-          Expect(res.body.data.phone.region)
-            .to.be.equal(keys.phone_region);
+          Expect(res.body.data.created_at)
+            .to.be.a('string');
+
+          Expect(res.body.data.updated_at)
+            .to.be.a('string');
 
           done();
         });
@@ -83,8 +82,7 @@ describe('Test /api/verify', () => {
     });
 
     it('should send incomplete data', (done) => {
-      const data = {
-      };
+      const data = {};
 
       Request(app)
         .post('/api/verify')
@@ -116,12 +114,8 @@ describe('Test /api/verify', () => {
       this.timeout(100000000);
 
       const data = {
-        user: {
-          email: 'example@outlook.com'
-        },
-        message: {
-          code: keys.verification_code
-        }
+        email: 'example@outlook.com',
+        code: keys.verification_code
       };
 
       Request(app)
@@ -152,12 +146,8 @@ describe('Test /api/verify', () => {
 
     it('should send an invalid verification code', (done) => {
       const data = {
-        user: {
-          email: keys.user_email
-        },
-        message: {
-          code: '123457'
-        }
+        email: keys.user_email,
+        code: '123457'
       };
 
       Request(app)
@@ -255,12 +245,8 @@ describe('Test /api/message', () => {
   context('POST', () => {
     it('should try to verify a verified account', (done) => {
       const data = {
-        user: {
-          email: keys.user_email
-        },
-        message: {
-          code: keys.verification_code
-        }
+        email: keys.user_email,
+        code: keys.verification_code
       };
 
       Request(app)
