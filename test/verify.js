@@ -58,12 +58,6 @@ describe('Test /api/verify', () => {
           Expect(res.body.data.phone.region)
             .to.be.equal(keys.phone_region);
 
-          Expect(res.body.status).to.have.property('code')
-            .and.to.be.equal(HttpStatus.ACCEPTED);
-
-          Expect(res.body.status).to.have.property('message')
-            .and.to.be.equal('Accepted');
-
           done();
         });
     });
