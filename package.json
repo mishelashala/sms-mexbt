@@ -1,6 +1,6 @@
 {
   "name": "sms.mexbt",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Email Verification Service",
   "main": "app.js",
   "engines": {

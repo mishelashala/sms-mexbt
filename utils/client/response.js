@@ -1,6 +1,6 @@
 'use strict';
 
-const ClientStatus = require('../client-status');
+const ClientStatus = require('./status');
 
 const create = (status) => {
   switch (status) {

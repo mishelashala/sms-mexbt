@@ -1,7 +1,7 @@
 'use strict';
 
 const HttpStatus = require('http-status');
-const ClientResponse = require('../client-response');
+const ClientResponse = require('../client/response');
 
 const create = ({ http, client, data }) => {
   const response = {};

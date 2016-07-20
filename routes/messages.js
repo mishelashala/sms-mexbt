@@ -6,7 +6,7 @@ const Twilio = require('twilio');
 const Mongoose = require('mongoose');
 
 const Response = require('../utils/response');
-const ClientStatus = require('../utils/client-status');
+const ClientStatus = require('../utils/client/status');
 const keys = require('../keys');
 const User = require('../databases/').models.user;
 const Datadog = require('../utils/datadog');

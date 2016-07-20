@@ -8,7 +8,7 @@ const Mongoose = require('mongoose');
 const Valid = require('../utils/valid');
 const User = require('../databases/').models.user;
 const Response = require('../utils/response');
-const ClientStatus = require('../utils/client-status');
+const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
 
 const Router = Express.Router();
