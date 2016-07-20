@@ -4,7 +4,7 @@ const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;
 
-const ClientStatus = require('../utils/client-status');
+const ClientStatus = require('../utils/client/status');
 const keys = require('../keys');
 const User = require('../databases/').models.user;
 const app = require('../app');
