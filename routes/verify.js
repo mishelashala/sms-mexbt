@@ -47,7 +47,7 @@ Router
          */
 
         User
-          .findOne({ user: { email: data.user.email } })
+          .findOne({ email: data.email })
           .exec()
           .then((_user) => {
             if (!_user) {
@@ -63,7 +63,7 @@ Router
                 .json(responseObject);
             }
 
-            if (_user.message.code !== data.message.code) {
+            if (_user.code !== data.code) {
               Datadog.report('verify_message', 'invalid_user_code');
 
               const responseObject = Response.create({
@@ -90,11 +90,13 @@ Router
             }
 
             /*!
-             * Change user verified status and then save
-             * the changes in the database.
+             * Change user verified status and the updated at property
+             * then save the changes in the database.
              */
 
             _user.verified = true;
+            _user.updated_at = Date.now();
+
             _user
               .save()
               .then(() => {
@@ -135,7 +137,7 @@ Router
 
                 return Axios.post('https://sim.mexbt.com:8451/ajax/v1/SetUserVerificationLevel', {
                   sessionToken: data.sessionToken,
-                  UserId: _user.user.email,
+                  UserId: _user.email,
                   VerificationLevel: '3'
                 });
               })

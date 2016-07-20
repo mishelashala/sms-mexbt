@@ -5,22 +5,23 @@ const Schema = Mongoose.Schema;
 
 const UserSchema = new Schema({
   phone: {
-    region: {
-      type: String
-    },
-    number: {
-      type: String
-    }
+    required: true,
+    type: String
   },
-  user: {
-    email: {
-      type: String
-    }
+  email: {
+    required: true,
+    type: String
   },
-  message: {
-    code: {
-      type: String
-    }
+  code: {
+    required: true,
+    type: String
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
+  },
+  updated_at: {
+    type: Date
   },
   verified: {
     type: Boolean,

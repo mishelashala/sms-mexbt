@@ -4,19 +4,17 @@ const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');
 const Mongoose = require('mongoose');
+const Cuid = require('cuid');
 
 const Response = require('../utils/response');
 const ClientStatus = require('../utils/client/status');
 const keys = require('../keys');
 const User = require('../databases/').models.user;
 const Datadog = require('../utils/datadog');
-const Format = require('../utils/format');
 const Valid = require('../utils/valid');
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
-
-Mongoose.Promise = Promise;
 
 Mongoose.Promise = Promise;
 
@@ -33,7 +31,7 @@ Router
          * and return a formated object
          */
 
-        const data = Format.message(req.body);
+        const data = req.body;
 
         /*!
          * If some field is missing...
@@ -58,7 +56,7 @@ Router
          */
 
         User
-          .findOne({user: { email: data.user.email }})
+          .findOne({ email: data.email })
           .exec()
           .then((user) => {
             if (!user) {
@@ -72,10 +70,12 @@ Router
              * Send the message using twilio library
              */
 
+            data.code = keys.verification_code || Cuid().slice(0, 8);
+
             client.messages.create({
-              to: `+${data.phone.region}${data.phone.number}`,
+              to: `+${data.phone}`,
               from: keys.twilio_phone_number,
-              body: data.message.code
+              body: data.code
             }, (err, msg) => {
               /*!
                * If something went wrong report to datadog and
@@ -84,6 +84,7 @@ Router
 
               if (err) {
                 Datadog.report('send_message', 'error_sending_sms');
+                console.log('twilio error:', err.message);
 
                 const responseObject = Response.create({
                   http: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -101,7 +102,7 @@ Router
                */
 
               Datadog.report('send_message', 'message_sent');
-              _user.message.code = data.message.code;
+              _user.code = data.code;
               _user.verified = false;
 
               /*!
@@ -125,7 +126,7 @@ Router
                     .status(HttpStatus.CREATED)
                     .json(responseObject);
                 })
-                .error(() => {
+                .catch(() => {
                   Datadog.report('send_message', 'error_database_registering_user');
 
                   const responseObject = Response.create({

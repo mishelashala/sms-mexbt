@@ -9,13 +9,8 @@ describe('Data Validator', () => {
   context('#message', () => {
     it('should return true if data is valid', () => {
       const data = {
-        phone: {
-          region: keys.phone_region,
-          number: keys.phone_number
-        },
-        user: {
-          email: keys.user_email
-        }
+        phone: `${keys.phone_region}${keys.phone_number}`,
+        email: `${keys.user_email}`
       };
 
       Expect(Valid.message(data)).to.be.equal(true);
@@ -23,58 +18,24 @@ describe('Data Validator', () => {
 
     it('should return false if phone property is not present', () => {
       const data = {
-        user: {
-          email: keys.user_email
-        }
+        email: keys.user_email
       };
 
       Expect(Valid.message(data)).to.be.equal(false);
     });
 
-    it('should return false if phone.region property is not present', () => {
+    it('should return false if email property is not present', () => {
       const data = {
-        phone: {
-          number: keys.phone_number
-        },
-        user: {
-          email: keys.user_email
-        }
+        phone: `${keys.phone_region}${keys.phone_number}`,
       };
 
       Expect(Valid.message(data)).to.be.equal(false);
     });
 
-    it('should return false if phone.number property is not present', () => {
+    it('should return false if phone.length property is different from 12', () => {
       const data = {
-        phone: {
-          region: keys.phone_region
-        },
-        user: {
-          email: keys.user_email
-        }
-      };
-
-      Expect(Valid.message(data)).to.be.equal(false);
-    });
-
-    it('should return false if user property is not present', () => {
-      const data = {
-        phone: {
-          region: keys.phone_region,
-          number: keys.phone_number
-        }
-      };
-
-      Expect(Valid.message(data)).to.be.equal(false);
-    });
-
-    it('should return false if user.email is not present', () => {
-      const data = {
-        phone: {
-          region: keys.phone_region,
-          number: keys.phone_number
-        },
-        user: {}
+        phone: `${keys.phone_region}${keys.phone_number}1`,
+        email: keys.user_email
       };
 
       Expect(Valid.message(data)).to.be.equal(false);
@@ -82,59 +43,56 @@ describe('Data Validator', () => {
   });
 
   context('#verification', () => {
-    it('should return false if message property is not present', () => {
+    it('should return true if the verification data is valid', () => {
       const data = {
-        user: {
-          email: keys.user_email
-        }
+        code: keys.verification_code,
+        email: keys.user_email
       };
 
-      Expect(Valid.verification(data)).to.be.equal(false);
+      Expect(
+        Valid.verification(data)
+      ).to.be.equal(true);
     });
 
-    it('should return false if message.code property is not present', () => {
+    it('should return false if code property is not present', () => {
       const data = {
-        message: {},
-        user: {
-          email: keys.user_email
-        }
+        email: keys.user_email
       };
 
-      Expect(Valid.verification(data)).to.be.equal(false);
+      Expect(
+        Valid.verification(data)
+      ).to.be.equal(false);
     });
 
-    it('should return false if user property is not present', () => {
+    it('should return false if code property is not present', () => {
       const data = {
-        message: {
-          code: keys.verification_code
-        }
+        email: keys.user_email
       };
 
-      Expect(Valid.verification(data)).to.be.equal(false);
+      Expect(
+        Valid.verification(data)
+      ).to.be.equal(false);
     });
 
-    it('should return false if user.code property is not present', () => {
+    it('should return false if email property is not present', () => {
       const data = {
-        message: {
-          code: keys.verification_code
-        },
-        user: {}
+        code: keys.verification_code
       };
 
-      Expect(Valid.verification(data)).to.be.equal(false);
+      Expect(
+        Valid.verification(data)
+      ).to.be.equal(false);
     });
 
-    it('should return false if message.code.length is not 6', () => {
+    it('should return false if code.length is not 6', () => {
       const data = {
-        message: {
-          code: '123456777'
-        },
-        user: {
-          email: keys.user_email
-        }
+        code: '123456777',
+        email: keys.user_email
       };
 
-      Expect(Valid.verification(data)).to.be.equal(false);
+      Expect(
+        Valid.verification(data)
+      ).to.be.equal(false);
     });
   });
 });

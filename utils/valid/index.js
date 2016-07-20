@@ -5,23 +5,11 @@ const message = (data) => {
     return false;
   }
 
-  if (data.phone.number === undefined) {
+  if (data.email === undefined) {
     return false;
   }
 
-  if (data.phone.region === undefined) {
-    return false;
-  }
-
-  if (data.phone.number.length !== 10) {
-    return false;
-  }
-
-  if (data.user === undefined) {
-    return false;
-  }
-
-  if (data.user.email === undefined) {
+  if (data.phone.length !== 12) {
     return false;
   }
 
@@ -29,23 +17,19 @@ const message = (data) => {
 };
 
 const verification = (data) => {
-  if (data.message === undefined) {
+  if (data.code === undefined) {
     return false;
   }
 
-  if (data.message.code === undefined) {
+  if (data.code.length !== 6) {
     return false;
   }
 
-  if (data.message.code.length !== 6) {
+  if (data.email === undefined) {
     return false;
   }
 
-  if (data.user === undefined) {
-    return false;
-  }
-
-  if (data.user.email === undefined) {
+  if (!data.email) {
     return false;
   }
 
