@@ -23,15 +23,12 @@ export const LogVerifyMessageType = {
   AlphapointAuth: 'alphapoint_auth',
   BadContentNegotiation: 'bad_content_negotiation',
   DatabaseConnectionError: 'error_database_connection',
+  InternalServerError: 'internal_server_error',
   InvalidUserEmail: 'invalid_user_email',
   InvalidUserCode: 'invalid_user_code',
   MethodNotAllowed: 'method_not_allowed',
   UserAlreadyVerified: 'user_already_verified',
   UserVerified: 'user_verified'
-}
-
-const UserVerificationServiceError = {
-  CouldNotVerify: 'error_database_verifying_user'
 }
 
 Router
@@ -169,9 +166,13 @@ Router
               clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
               break;
 
-            default:
-              Datadog.report(LogType.VerifyMessage, UserVerificationServiceError.CouldNotVerify);
+            case UserServiceError.CouldNotVerify:
+              Datadog.report(LogType.VerifyMessage, UserServiceError.CouldNotVerify);
               clientStatus = ClientStatus.DATABASE_CONNECTION_FAILED;
+              break;
+
+            default:
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InternalServerError);
               break;
           }
 
