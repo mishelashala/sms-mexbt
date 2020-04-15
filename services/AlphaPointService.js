@@ -1,8 +1,8 @@
 const Axios = require('axios');
 
 export const AlphapointServiceError = {
-  Auth: 'Alphapoint Auth',
-  ChangeVerificationLevel: 'Alphapoint Change Verification Level'
+  CouldNotAuth: 'Alphapoint Error: Could Not Auth',
+  CouldNotChangeVerificationLevel: 'Alphapoint Error: Coudl Not Change Verification Level'
 }
 
 /*!
@@ -15,7 +15,7 @@ async function auth() {
   });
 
   if (!data.isAccepted) {
-    throw new Error(AlphapointServiceError.Auth)
+    throw new Error(AlphapointServiceError.CouldNotAuth)
   }
 
   return data
@@ -32,7 +32,7 @@ async function verifyUser({ token, email }) {
   });
 
   if (!data.isAccepted) {
-    throw new Error(AlphapointServiceError.ChangeVerificationLevel);
+    throw new Error(AlphapointServiceError.CouldNotChangeVerificationLevel);
   }
 
   return data

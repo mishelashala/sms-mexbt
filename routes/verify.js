@@ -2,8 +2,8 @@ const Express = require('express');
 const HttpStatus = require('http-status');
 
 const { validateMessageBody } = require('../middlewares/validation')
-const AlphapointService = require('../services/AlphaPointSerice')
-const UserService = require('../services/UserService')
+const AlphapointService, { AlphapointServiceError } = require('../services/AlphaPointSerice')
+const UserService, { UserServiceError } = require('../services/UserService')
 const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
 const Response = require('../utils/response');
@@ -17,10 +17,11 @@ export const LogType = {
 export const LogVerifyMessageType = {
   AlphapointAuth: 'alphapoint_auth',
   BadContentNegotiation: 'bad_content_negotiation',
+  CouldNotChangeAlphapointVerificationLevel: 'could_not_change_alphapoint_verification_level',
   DatabaseConnectionError: 'error_database_connection',
   InternalServerError: 'internal_server_error',
-  InvalidUserEmail: 'invalid_user_email',
-  InvalidUserCode: 'invalid_user_code',
+  InvalidUserEmail: 'invaliduser_email',
+  InvalidUserCode: 'invaliduser_code',
   MethodNotAllowed: 'method_not_allowed',
   UserAlreadyVerified: 'user_already_verified',
   UserVerified: 'user_verified'
@@ -45,17 +46,17 @@ Router
            * Search one user in the database using the email as query
            */
 
-          const _user = await UserService.findOneByEmailAndCode({ email: data.email, code: data.code })
+          const user = await UserService.findOneByEmailAndCode({ email: data.email, code: data.code })
 
           /*!
            * Change user verified status and the updated at property
            * then save the changes in the database.
            */
 
-          _user.verified = true;
-          _user.updated_at = Date.now();
+          user.verified = true;
+          user.updated_at = Date.now();
 
-          await _user.save()
+          await user.save()
 
           /*!
            * Auth Attempt To Alphapoint
@@ -67,11 +68,7 @@ Router
            * Attempt to change user verification level
            */
 
-          await AlphapointService.verifyUser({ token: data.sessionToken, email: _user.email })
-
-          /*!
-           * If could not change verification level return error
-           */
+          await AlphapointService.verifyUser({ token: data.sessionToken, email: user.email })
 
           /*!
            * Report to datadog
@@ -86,7 +83,7 @@ Router
           const responseObject = Response.create({
             http: HttpStatus.ACCEPTED,
             client: ClientStatus.USER_VERIFIED,
-            data: _user
+            data: user
           });
 
           return res
@@ -101,14 +98,14 @@ Router
            */
 
           switch (err.message) {
-            case AlphapointServiceError.Auth:
+            case AlphapointServiceError.CouldNotAuth:
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.AlphapointAuth);
               clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
               http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
 
-            case AlphapointServiceError.ChangeVerificationLevel:
-              Datadog.report(LogType.VerifyMessage, AlphapointServiceError.ChangeVerificationLevel);
+            case AlphapointServiceError.CouldNotChangeVerificationLevel:
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.CouldNotChangeAlphapointVerificationLevel);
               clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
               http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
