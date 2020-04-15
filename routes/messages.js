@@ -1,18 +1,15 @@
 const Express = require("express");
 const HttpStatus = require("http-status");
-const Twilio = require("twilio");
 const Mongoose = require("mongoose");
 const Cuid = require("cuid");
 
 const Response = require("../utils/response");
 const ClientStatus = require("../utils/client/status");
-const keys = require("../keys");
 const User = require("../databases/").models.user;
 const Datadog = require("../utils/datadog");
 const validateUserData = require("../middlewares/validation");
 
 const Router = Express.Router();
-const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 
 Mongoose.Promise = Promise;
 
@@ -40,7 +37,7 @@ Router.post("/", validateUserData, async (req, res) => {
      * Send the message using twilio library
      */
 
-    data.code = keys.verification_code || Cuid().slice(0, 8);
+    data.code = Cuid().slice(0, 8);
 
     await SmsService.sendTextMessage({
       phone,
@@ -53,6 +50,12 @@ Router.post("/", validateUserData, async (req, res) => {
      */
 
     Datadog.report("send_message", "message_sent");
+
+    /*!
+     * Add verification code to user and flag it as
+     * unverified
+     */
+
     _user.code = data.code;
     _user.verified = false;
 
@@ -62,29 +65,21 @@ Router.post("/", validateUserData, async (req, res) => {
      * send the response
      */
 
-    _user
-      .save({ upsert: true })
-      .then(() => {
-        Datadog.report("send_message", "message_database_saved");
+    await _user.save({ upsert: true });
 
-        const responseObject = Response.create({
-          http: HttpStatus.CREATED,
-          client: ClientStatus.MESSAGE_SENT,
-          data: _user,
-        });
+    /*!
+     * Notify to datadog message was sent
+     */
 
-        res.status(HttpStatus.CREATED).json(responseObject);
-      })
-      .catch(() => {
-        Datadog.report("send_message", "error_database_registering_user");
+    Datadog.report("send_message", "message_database_saved");
 
-        const responseObject = Response.create({
-          http: HttpStatus.INTERNAL_SERVER_ERROR,
-          client: ClientStatus.MESSAGE_NOT_SENT,
-        });
+    const responseObject = Response.create({
+      http: HttpStatus.CREATED,
+      client: ClientStatus.MESSAGE_SENT,
+      data: _user,
+    });
 
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseObject);
-      });
+    res.status(HttpStatus.CREATED).json(responseObject);
   } catch (err) {
     let http;
 

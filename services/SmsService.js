@@ -1,3 +1,8 @@
+const Twilio = require("twilio");
+const keys = require("../keys");
+
+const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
+
 function sendTextMessage({ phone, message }) {
   return new Promise((resolve, reject) => {
     client.messages.create(
