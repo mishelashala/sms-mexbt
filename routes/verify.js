@@ -95,9 +95,9 @@ Router
           }
 
           /*!
-            * Change user verified status and the updated at property
-            * then save the changes in the database.
-            */
+           * Change user verified status and the updated at property
+           * then save the changes in the database.
+           */
 
           _user.verified = true;
           _user.updated_at = Date.now();
@@ -105,8 +105,8 @@ Router
           await _user.save()
 
           /*!
-            * Report to datadog
-            */
+           * Report to datadog
+           */
 
           Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
 
@@ -117,29 +117,30 @@ Router
           const { data } = await AlphapointService.auth()
 
           /*!
-            * If login was not successfull return error
-            */
+           * If login was not successfull return error
+           */
+
           if (!data.isAccepted) {
-            return Promise.reject({ message: AlphapointError.Auth });
+            throw new Error(AlphapointError.Auth);
           }
 
           /*!
-            * Attempt to change user verification level
-            */
+           * Attempt to change user verification level
+           */
 
           const response = await AlphapointService.verifyUser({ token: data.sessionToken, email: _user.email })
 
           /*!
-            * If could not change verification level return error
-            */
+           * If could not change verification level return error
+           */
 
           if (!response.data.isAccepted) {
-            return Promise.reject({ message: AlphapointError.ChangeVerificationLevel });
+            throw new Error(AlphapointError.ChangeVerificationLevel);
           }
 
           /*!
-            * If verification level changed respond 202 Accepted
-            */
+           * If verification level changed respond 202 Accepted
+           */
 
           const responseObject = Response.create({
             http: HttpStatus.ACCEPTED,
@@ -154,8 +155,8 @@ Router
           let clientStatus;
 
           /*!
-            * Handle client status and message
-            */
+           * Handle client status and message
+           */
 
           switch (err.message) {
             case AlphapointError.Auth:
