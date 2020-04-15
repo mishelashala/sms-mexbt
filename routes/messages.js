@@ -1,43 +1,36 @@
 const Express = require("express");
 const HttpStatus = require("http-status");
-const Mongoose = require("mongoose");
 const Cuid = require("cuid");
 
 const Response = require("../utils/response");
 const ClientStatus = require("../utils/client/status");
-const User = require("../databases/").models.user;
 const Datadog = require("../utils/datadog");
 const validateUserData = require("../middlewares/validation");
+const UserService = require("../services/UserService");
 
-const Router = Express.Router();
+const MessageRouter = Express.Router();
 
-Mongoose.Promise = Promise;
-
-Router.post("/", validateUserData, async (req, res) => {
-  /*!
-   * #createVerificationData takes the body of the request
-   * and return a formated object
-   */
-
-  const data = req.body;
-
-  /*!
-   * Search one result from the database using
-   * the email as query
-   */
-
+MessageRouter.post("/", validateUserData, async (req, res) => {
   try {
-    let _user = await User.findOne({ email: data.email }).exec();
+    /*!
+     * #createVerificationData takes the body of the request
+     * and return a formated object
+     */
 
-    if (!_user) {
-      _user = new User(data);
-    }
+    const data = req.body;
+
+    /*!
+     * Search one result from the database using
+     * the email as query
+     */
+
+    const user = UserService.findOneByEmailOrCreate(data.email);
+
+    data.code = Cuid().slice(0, 8);
 
     /*!
      * Send the message using twilio library
      */
-
-    data.code = Cuid().slice(0, 8);
 
     await SmsService.sendTextMessage({
       phone,
@@ -56,8 +49,8 @@ Router.post("/", validateUserData, async (req, res) => {
      * unverified
      */
 
-    _user.code = data.code;
-    _user.verified = false;
+    user.code = data.code;
+    user.verified = false;
 
     /*!
      * Save the user, if is not in the data base
@@ -65,7 +58,7 @@ Router.post("/", validateUserData, async (req, res) => {
      * send the response
      */
 
-    await _user.save({ upsert: true });
+    await user.save({ upsert: true });
 
     /*!
      * Notify to datadog message was sent
@@ -76,7 +69,7 @@ Router.post("/", validateUserData, async (req, res) => {
     const responseObject = Response.create({
       http: HttpStatus.CREATED,
       client: ClientStatus.MESSAGE_SENT,
-      data: _user,
+      data: user,
     });
 
     res.status(HttpStatus.CREATED).json(responseObject);
@@ -105,4 +98,4 @@ Router.post("/", validateUserData, async (req, res) => {
   }
 });
 
-module.exports = Router;
+module.exports = MessageRouter;

@@ -1,7 +1,17 @@
 const Mongoose = require('mongoose');
-const User = require('../databases/').models.user;
+const UserModel = require('../databases/').models.user;
 
 Mongoose.Promise = Promise;
+
+async function findOneByEmailOrCreate(email) {
+  let user = await UserModel.findOne({ email }).exec();
+
+  if (!user) {
+    user = new User(data);
+  }
+
+  return user
+}
 
 /*!
  * Searches for the the user
@@ -21,6 +31,7 @@ function markAsVerified({ code, email }) {
 }
 
 module.exports = {
+  findOneByEmailOrCreate,
   markAsVerified,
   UserServiceError,
 }
