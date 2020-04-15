@@ -10,11 +10,6 @@ const Response = require('../utils/response');
 
 const Router = Express.Router();
 
-export const AlphapointError = {
-  Auth: 'Alphapoint Auth',
-  ChangeVerificationLevel: 'Alphapoint Change Verification Level'
-}
-
 export const LogType = {
   VerifyMessage: 'verify_message',
 }
@@ -69,26 +64,14 @@ Router
           const { data } = await AlphapointService.auth()
 
           /*!
-           * If login was not successfull return error
-           */
-
-          if (!data.isAccepted) {
-            throw new Error(AlphapointError.Auth);
-          }
-
-          /*!
            * Attempt to change user verification level
            */
 
-          const response = await AlphapointService.verifyUser({ token: data.sessionToken, email: _user.email })
+          await AlphapointService.verifyUser({ token: data.sessionToken, email: _user.email })
 
           /*!
            * If could not change verification level return error
            */
-
-          if (!response.data.isAccepted) {
-            throw new Error(AlphapointError.ChangeVerificationLevel);
-          }
 
           /*!
            * Report to datadog
@@ -118,14 +101,14 @@ Router
            */
 
           switch (err.message) {
-            case AlphapointError.Auth:
+            case AlphapointServiceError.Auth:
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.AlphapointAuth);
               clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
               http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
 
-            case AlphapointError.ChangeVerificationLevel:
-              Datadog.report(LogType.VerifyMessage, AlphapointError.ChangeVerificationLevel);
+            case AlphapointServiceError.ChangeVerificationLevel:
+              Datadog.report(LogType.VerifyMessage, AlphapointServiceError.ChangeVerificationLevel);
               clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
               http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
