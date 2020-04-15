@@ -18,7 +18,6 @@ Mongoose.connect(require('./databases').uri);
  */
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: false }));
-app.use(cors());
 
 /*!
  * Routing (endpoints)
