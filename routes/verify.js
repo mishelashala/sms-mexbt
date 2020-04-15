@@ -1,18 +1,14 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
-const Axios = require('axios');
-const Mongoose = require('mongoose');
 
-const User = require('../databases/').models.user;
 const { validateMessageBody } = require('../middlewares/validation')
 const AlphapointService = require('../services/AlphaPointSerice')
+const UserService = require('../services/UserService')
 const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
 const Response = require('../utils/response');
 
 const Router = Express.Router();
-
-Mongoose.Promise = Promise;
 
 export const AlphapointError = {
   Auth: 'Alphapoint Auth',
@@ -56,9 +52,8 @@ Router
          * Search one user in the database using the email as query
          */
 
-        User
-          .findOne({ email: data.email })
-          .exec()
+        UserService
+          .findOneByEmail(data.email)
           .then(async (_user) => {
             try {
               if (!_user) {
@@ -101,51 +96,51 @@ Router
               }
 
               /*!
-              * Change user verified status and the updated at property
-              * then save the changes in the database.
-              */
+               * Change user verified status and the updated at property
+               * then save the changes in the database.
+               */
 
               _user.verified = true;
               _user.updated_at = Date.now();
 
               await _user.save()
 
-              /*
-              * Report to datadog
-              */
+              /*!
+               * Report to datadog
+               */
 
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
 
               /*!
-              * Auth Attempt To Alphapoint
-              */
+               * Auth Attempt To Alphapoint
+               */
 
               const { data } = await AlphapointService.auth()
 
               /*!
-                * If login was not successfull return error
-                */
+               * If login was not successfull return error
+               */
               if (!data.isAccepted) {
                 return Promise.reject({ message: AlphapointError.Auth });
               }
 
               /*!
-              * Attempt to change user verification level
-              */
+               * Attempt to change user verification level
+               */
 
               const response = await AlphapointService.verifyUser({ token: data.sessionToken, email: _user.email })
 
               /*!
-              * If could not change verification level return error
-              */
+               * If could not change verification level return error
+               */
 
               if (!response.data.isAccepted) {
                 return Promise.reject({ message: AlphapointError.ChangeVerificationLevel });
               }
 
               /*!
-              * If verification level changed respond 202 Accepted
-              */
+               * If verification level changed respond 202 Accepted
+               */
 
               const responseObject = Response.create({
                 http: HttpStatus.ACCEPTED,
@@ -160,8 +155,8 @@ Router
               let clientStatus;
 
               /*!
-                * Handle client status and message
-                */
+               * Handle client status and message
+               */
 
               switch (err.message) {
                 case AlphapointError.Auth:
