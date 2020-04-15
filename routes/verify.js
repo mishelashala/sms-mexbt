@@ -2,7 +2,7 @@ const Express = require('express');
 const HttpStatus = require('http-status');
 
 const { validateMessageBody } = require('../middlewares/validation')
-const AlphapointService, { AlphapointServiceError } = require('../services/AlphaPointSerice')
+const AlphapointService, { AlphapointServiceError } = require('../services/AlphaPointService')
 const UserService, { UserServiceError } = require('../services/UserService')
 const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
@@ -23,7 +23,6 @@ export const LogVerifyMessageType = {
   InvalidUserEmail: 'invaliduser_email',
   InvalidUserCode: 'invaliduser_code',
   MethodNotAllowed: 'method_not_allowed',
-  UserAlreadyVerified: 'user_already_verified',
   UserVerified: 'user_verified'
 }
 
@@ -40,35 +39,25 @@ Router
            * Store the data from request body
            */
 
-          const data = req.body;
+          const { code, email } = req.body;
 
           /*!
-           * Search one user in the database using the email as query
+           * Attempt to mark the user as verified on our database
            */
 
-          const user = await UserService.findOneByEmailAndCode({ email: data.email, code: data.code })
+          const user = await UserService.markAsVerified({ code, email })
 
           /*!
-           * Change user verified status and the updated at property
-           * then save the changes in the database.
+           * Attempt to auth to alphapoint service
            */
 
-          user.verified = true;
-          user.updated_at = Date.now();
-
-          await user.save()
-
-          /*!
-           * Auth Attempt To Alphapoint
-           */
-
-          const { data } = await AlphapointService.auth()
+          const { sessionToken } = await AlphapointService.auth()
 
           /*!
            * Attempt to change user verification level
            */
 
-          await AlphapointService.verifyUser({ token: data.sessionToken, email: user.email })
+          await AlphapointService.verifyUser({ token: sessionToken, email: user.email })
 
           /*!
            * Report to datadog
@@ -119,12 +108,6 @@ Router
             case UserServiceError.NotFound:
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
               clientStatus = ClientStatus.USER_NOT_FOUND
-              http = HttpStatus.BAD_REQUEST
-              break
-
-            case UserServiceError.AlreadyVerified:
-              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserAlreadyVerified);
-              clientStatus = ClientStatus.USER_ALREADY_VERIFIED
               http = HttpStatus.BAD_REQUEST
               break
 
