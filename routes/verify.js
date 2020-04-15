@@ -8,7 +8,7 @@ const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
 const Response = require('../utils/response');
 
-const Router = Express.Router();
+const VerifyRouter = Express.Router();
 
 export const LogType = {
   VerifyMessage: 'verify_message',
@@ -26,164 +26,99 @@ export const LogVerifyMessageType = {
   UserVerified: 'user_verified'
 }
 
-Router
-  .post('/', validateMessageBody, (req, res) => {
-    /*!
-     * Content negotiation (REST)
-     */
+VerifyRouter
+  .post('/', validateMessageBody, async (req, res) => {
+    try {
+      /*!
+        * Store the data from request body
+        */
 
-    res.format({
-      ['application/json']: async () => {
-        try {
-          /*!
-           * Store the data from request body
-           */
-
-          const { code, email } = req.body;
-
-          /*!
-           * Attempt to mark the user as verified on our database
-           */
-
-          const user = await UserService.markAsVerified({ code, email })
-
-          /*!
-           * Attempt to auth to alphapoint service
-           */
-
-          const { sessionToken } = await AlphapointService.auth()
-
-          /*!
-           * Attempt to change user verification level
-           */
-
-          await AlphapointService.verifyUser({ token: sessionToken, email: user.email })
-
-          /*!
-           * Report to datadog
-           */
-
-          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
-
-          /*!
-           * If everything went fine respond with 202 Accepted
-           */
-
-          const responseObject = Response.create({
-            http: HttpStatus.ACCEPTED,
-            client: ClientStatus.USER_VERIFIED,
-            data: user
-          });
-
-          return res
-            .status(HttpStatus.ACCEPTED)
-            .json(responseObject);
-        } catch(err) {
-          let clientStatus;
-          let http;
-
-          /*!
-           * Handle client status and message
-           */
-
-          switch (err.message) {
-            case AlphapointServiceError.CouldNotAuth:
-              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.AlphapointAuth);
-              clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
-              http = HttpStatus.INTERNAL_SERVER_ERROR
-              break;
-
-            case AlphapointServiceError.CouldNotChangeVerificationLevel:
-              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.CouldNotChangeAlphapointVerificationLevel);
-              clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
-              http = HttpStatus.INTERNAL_SERVER_ERROR
-              break;
-
-            case UserServiceError.CouldNotVerify:
-              Datadog.report(LogType.VerifyMessage, UserServiceError.CouldNotVerify);
-              clientStatus = ClientStatus.DATABASE_CONNECTION_FAILED;
-              http = HttpStatus.INTERNAL_SERVER_ERROR
-              break;
-
-            case UserServiceError.NotFound:
-              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
-              clientStatus = ClientStatus.USER_NOT_FOUND
-              http = HttpStatus.BAD_REQUEST
-              break
-
-            default:
-              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InternalServerError);
-              break;
-          }
-
-          const responseObject = Response.create({
-            http,
-            client: clientStatus,
-          });
-
-          res
-            .status(http)
-            .json(responseObject);
-        }
-      },
+      const { code, email } = req.body;
 
       /*!
-       * If the Accept header is different from application/json
-       * this code is executed
-       */
+        * Attempt to mark the user as verified on our database
+        */
 
-      default () {
-        Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.BadContentNegotiation);
+      const user = await UserService.markAsVerified({ code, email })
 
-        const responseObject = Response.create({
-          http: HttpStatus.NOT_ACCEPTABLE
-        });
+      /*!
+        * Attempt to auth to alphapoint service
+        */
 
-        res
-          .status(HttpStatus.NOT_ACCEPTABLE)
-          .json(responseObject);
+      const { sessionToken } = await AlphapointService.auth()
+
+      /*!
+        * Attempt to change user verification level
+        */
+
+      await AlphapointService.verifyUser({ token: sessionToken, email: user.email })
+
+      /*!
+        * Report to datadog
+        */
+
+      Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
+
+      /*!
+        * If everything went fine respond with 202 Accepted
+        */
+
+      const responseObject = Response.create({
+        http: HttpStatus.ACCEPTED,
+        client: ClientStatus.USER_VERIFIED,
+        data: user
+      });
+
+      return res
+        .status(HttpStatus.ACCEPTED)
+        .json(responseObject);
+    } catch(err) {
+      let clientStatus;
+      let http;
+
+      /*!
+        * Handle client status and message
+        */
+
+      switch (err.message) {
+        case AlphapointServiceError.CouldNotAuth:
+          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.AlphapointAuth);
+          clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
+          http = HttpStatus.INTERNAL_SERVER_ERROR
+          break;
+
+        case AlphapointServiceError.CouldNotChangeVerificationLevel:
+          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.CouldNotChangeAlphapointVerificationLevel);
+          clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
+          http = HttpStatus.INTERNAL_SERVER_ERROR
+          break;
+
+        case UserServiceError.CouldNotVerify:
+          Datadog.report(LogType.VerifyMessage, UserServiceError.CouldNotVerify);
+          clientStatus = ClientStatus.DATABASE_CONNECTION_FAILED;
+          http = HttpStatus.INTERNAL_SERVER_ERROR
+          break;
+
+        case UserServiceError.NotFound:
+          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
+          clientStatus = ClientStatus.USER_NOT_FOUND
+          http = HttpStatus.BAD_REQUEST
+          break
+
+        default:
+          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InternalServerError);
+          break;
       }
-    });
-  })
 
-  /*!
-   * The rest of the HTTP Verbs are not allowed
-   */
+      const responseObject = Response.create({
+        http,
+        client: clientStatus,
+      });
 
-  .get('/', (req, res) => {
-    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.MethodNotAllowed);
-
-    const responseObject = Response.create({
-      http: HttpStatus.METHOD_NOT_ALLOWED
-    });
-
-    res
-      .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(responseObject);
-  })
-
-  .put('/', (req, res) => {
-    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.MethodNotAllowed);
-
-    const responseObject = Response.create({
-      http: HttpStatus.METHOD_NOT_ALLOWED
-    });
-
-    res
-      .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(responseObject);
-  })
-
-  .delete('/', (req, res) => {
-    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.MethodNotAllowed);
-
-    const responseObject = Response.create({
-      http: HttpStatus.METHOD_NOT_ALLOWED
-    });
-
-    res
-      .status(HttpStatus.METHOD_NOT_ALLOWED)
-      .json(responseObject);
+      res
+        .status(http)
+        .json(responseObject);
+    }
   });
 
-module.exports = Router;
+module.exports = VerifyRouter;
