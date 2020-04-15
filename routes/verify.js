@@ -1,7 +1,7 @@
 const Express = require('express');
 const HttpStatus = require('http-status');
 
-const { validateMessageBody } = require('../middlewares/validation')
+const { validateVerificationData } = require('../middlewares/validation')
 const AlphapointService, { AlphapointServiceError } = require('../services/AlphaPointService')
 const UserService, { UserServiceError } = require('../services/UserService')
 const ClientStatus = require('../utils/client/status');
@@ -27,7 +27,7 @@ export const LogVerifyMessageType = {
 }
 
 VerifyRouter
-  .post('/', validateMessageBody, async (req, res) => {
+  .post('/', validateVerificationData, async (req, res) => {
     try {
       /*!
         * Store the data from request body

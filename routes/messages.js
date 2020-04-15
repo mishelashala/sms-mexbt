@@ -1,86 +1,69 @@
-const Express = require('express');
-const HttpStatus = require('http-status');
-const Twilio = require('twilio');
-const Mongoose = require('mongoose');
-const Cuid = require('cuid');
+const Express = require("express");
+const HttpStatus = require("http-status");
+const Twilio = require("twilio");
+const Mongoose = require("mongoose");
+const Cuid = require("cuid");
 
-const Response = require('../utils/response');
-const ClientStatus = require('../utils/client/status');
-const keys = require('../keys');
-const User = require('../databases/').models.user;
-const Datadog = require('../utils/datadog');
-const Valid = require('../utils/valid');
+const Response = require("../utils/response");
+const ClientStatus = require("../utils/client/status");
+const keys = require("../keys");
+const User = require("../databases/").models.user;
+const Datadog = require("../utils/datadog");
+const validateUserData = require("../middlewares/validation");
 
 const Router = Express.Router();
 const client = new Twilio.RestClient(keys.account_sid, keys.auth_token);
 
 Mongoose.Promise = Promise;
 
-Router
-  .post('/', (req, res) => {
-    /*!
-     * #createVerificationData takes the body of the request
-     * and return a formated object
-     */
+Router.post("/", validateUserData, (req, res) => {
+  /*!
+   * #createVerificationData takes the body of the request
+   * and return a formated object
+   */
 
-    const data = req.body;
+  const data = req.body;
 
-    /*!
-     * If some field is missing...
-     */
+  /*!
+   * Search one result from the database using
+   * the email as query
+   */
 
-    if (!Valid.message(data)) {
-      Datadog.report('send_message', 'invalid_user_input');
+  User.findOne({ email: data.email })
+    .exec()
+    .then((user) => {
+      if (!user) {
+        return new User(data);
+      }
 
-      const responseObject = Response.create({
-        http: HttpStatus.BAD_REQUEST,
-        client: ClientStatus.INVALID_USER_INPUT
-      });
+      return user;
+    })
+    .then((_user) => {
+      /*!
+       * Send the message using twilio library
+       */
 
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json(responseObject);
-    }
+      data.code = keys.verification_code || Cuid().slice(0, 8);
 
-    /*!
-     * Search one result from the database using
-     * the email as query
-     */
-
-    User
-      .findOne({ email: data.email })
-      .exec()
-      .then((user) => {
-        if (!user) {
-          return new User(data);
-        }
-
-        return user;
-      })
-      .then((_user) => {
-        /*!
-         * Send the message using twilio library
-         */
-
-        data.code = keys.verification_code || Cuid().slice(0, 8);
-
-        client.messages.create({
+      client.messages.create(
+        {
           to: `+${data.phone}`,
           from: keys.twilio_phone_number,
-          body: data.code
-        }, (err, msg) => {
+          body: data.code,
+        },
+        (err, msg) => {
           /*!
            * If something went wrong report to datadog and
            * send a error response
            */
 
           if (err) {
-            Datadog.report('send_message', 'error_sending_sms');
-            console.log('twilio error:', err.message);
+            Datadog.report("send_message", "error_sending_sms");
+            console.log("twilio error:", err.message);
 
             const responseObject = Response.create({
               http: HttpStatus.INTERNAL_SERVER_ERROR,
-              client: ClientStatus.MESSAGE_NOT_SENT
+              client: ClientStatus.MESSAGE_NOT_SENT,
             });
 
             return res
@@ -93,7 +76,7 @@ Router
            * Set code message to user and verified to false
            */
 
-          Datadog.report('send_message', 'message_sent');
+          Datadog.report("send_message", "message_sent");
           _user.code = data.code;
           _user.verified = false;
 
@@ -106,44 +89,39 @@ Router
           _user
             .save({ upsert: true })
             .then((doc) => {
-              Datadog.report('send_message', 'message_database_saved');
+              Datadog.report("send_message", "message_database_saved");
 
               const responseObject = Response.create({
                 http: HttpStatus.CREATED,
                 client: ClientStatus.MESSAGE_SENT,
-                data: _user
+                data: _user,
               });
 
-              res
-                .status(HttpStatus.CREATED)
-                .json(responseObject);
+              res.status(HttpStatus.CREATED).json(responseObject);
             })
             .catch(() => {
-              Datadog.report('send_message', 'error_database_registering_user');
+              Datadog.report("send_message", "error_database_registering_user");
 
               const responseObject = Response.create({
                 http: HttpStatus.INTERNAL_SERVER_ERROR,
-                client: ClientStatus.MESSAGE_NOT_SENT
+                client: ClientStatus.MESSAGE_NOT_SENT,
               });
 
-              res
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .json(responseObject);
+              res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseObject);
             });
-        });
-      })
-      .catch(() => {
-        Datadog.report('send_message', 'error_database_connection');
+        }
+      );
+    })
+    .catch(() => {
+      Datadog.report("send_message", "error_database_connection");
 
-        const responseObject = Response.create({
-          http: HttpStatus.INTERNAL_SERVER_ERROR,
-          client: ClientStatus.DATABASE_CONNECTION_FAILED
-        });
-
-        res
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .json(responseObject);
+      const responseObject = Response.create({
+        http: HttpStatus.INTERNAL_SERVER_ERROR,
+        client: ClientStatus.DATABASE_CONNECTION_FAILED,
       });
-  })
+
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseObject);
+    });
+});
 
 module.exports = Router;
