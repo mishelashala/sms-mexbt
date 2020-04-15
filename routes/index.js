@@ -1,4 +1,4 @@
 module.exports = {
-  messages: require('./messages'),
-  verify: require('./verify')
+  messages: require("./messages"),
+  verify: require("./verify"),
 };

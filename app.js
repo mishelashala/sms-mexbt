@@ -1,16 +1,16 @@
-const Express = require('express');
-const BodyParser = require('body-parser');
-const HttpStatus = require('http-status');
-const Mongoose = require('mongoose');
-const cors = require('cors');
+const Express = require("express");
+const BodyParser = require("body-parser");
+const HttpStatus = require("http-status");
+const Mongoose = require("mongoose");
+const cors = require("cors");
 
-const Response = require('./utils/response');
-const messagesRoute = require('./routes/').messages;
-const verifyRoute = require('./routes/').verify;
+const Response = require("./utils/response");
+const messagesRoute = require("./routes/").messages;
+const verifyRoute = require("./routes/").verify;
 
 const app = Express();
 
-Mongoose.connect(require('./databases').uri);
+Mongoose.connect(require("./databases").uri);
 
 /*!
  * Always create a JSON representation of the
@@ -22,8 +22,8 @@ app.use(BodyParser.urlencoded({ extended: false }));
 /*!
  * Routing (endpoints)
  */
-app.use('/api/messages/', messagesRoute);
-app.use('/api/verify', verifyRoute);
+app.use("/api/messages/", messagesRoute);
+app.use("/api/verify", verifyRoute);
 
 /*!
  * Not Found Middleware

@@ -1,30 +1,30 @@
-const Mongoose = require('mongoose');
+const Mongoose = require("mongoose");
 const Schema = Mongoose.Schema;
 
 const UserSchema = new Schema({
   phone: {
     required: true,
-    type: String
+    type: String,
   },
   email: {
     required: true,
-    type: String
+    type: String,
   },
   code: {
     required: true,
-    type: String
+    type: String,
   },
   created_at: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updated_at: {
-    type: Date
+    type: Date,
   },
   verified: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 module.exports = UserSchema;
