@@ -8,13 +8,19 @@ const UserServiceError = {
   UserNotFound: 'user_not_found'
 }
 
-function findOneByEmail(email) {
-  return User
-    .findOne({ email })
+async function findOneByEmailAndCode({ code, email }) {
+  const user = await User
+    .findOne({ code, email })
     .exec()
+
+  if (!user) {
+    throw new Error(UserServiceError.UserNotFound)
+  }
+
+  return user
 }
 
 module.exports = {
-  findOneByEmail,
+  findOneByEmailAndCode,
   UserServiceError,
 }

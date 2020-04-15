@@ -50,33 +50,7 @@ Router
            * Search one user in the database using the email as query
            */
 
-          const _user = await UserService.findOneByEmail(data.email)
-
-          if (!_user) {
-            Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
-
-            const responseObject = Response.create({
-              http: HttpStatus.BAD_REQUEST,
-              client: ClientStatus.USER_NOT_FOUND
-            });
-
-            return res
-              .status(HttpStatus.BAD_REQUEST)
-              .json(responseObject);
-          }
-
-          if (_user.code !== data.code) {
-            Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserCode);
-
-            const responseObject = Response.create({
-              http: HttpStatus.BAD_REQUEST,
-              client: ClientStatus.INVALID_VERIFICATION_CODE
-            });
-
-            return res
-              .status(HttpStatus.BAD_REQUEST)
-              .json(responseObject);
-          }
+          const _user = await UserService.findOneByEmailAndCode({ email: data.email, code: data.code })
 
           if (_user.verified) {
             Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserAlreadyVerified);
@@ -108,8 +82,8 @@ Router
           Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
 
           /*!
-            * Auth Attempt To Alphapoint
-            */
+           * Auth Attempt To Alphapoint
+           */
 
           const { data } = await AlphapointService.auth()
 
@@ -150,6 +124,7 @@ Router
             .json(responseObject);
         } catch(err) {
           let clientStatus;
+          let http;
 
           /*!
            * Handle client status and message
@@ -159,17 +134,26 @@ Router
             case AlphapointError.Auth:
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.AlphapointAuth);
               clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
+              http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
 
             case AlphapointError.ChangeVerificationLevel:
               Datadog.report(LogType.VerifyMessage, AlphapointError.ChangeVerificationLevel);
               clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
+              http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
 
             case UserServiceError.CouldNotVerify:
               Datadog.report(LogType.VerifyMessage, UserServiceError.CouldNotVerify);
               clientStatus = ClientStatus.DATABASE_CONNECTION_FAILED;
+              http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
+
+            case UserServiceError.UserNotFound:
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
+              clientStatus = ClientStatus.USER_NOT_FOUND
+              http = HttpStatus.BAD_REQUEST
+              break
 
             default:
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InternalServerError);
@@ -177,12 +161,12 @@ Router
           }
 
           const responseObject = Response.create({
-            http: HttpStatus.INTERNAL_SERVER_ERROR,
+            http,
             client: clientStatus,
           });
 
           res
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .status(http)
             .json(responseObject);
         }
       },
