@@ -13,6 +13,11 @@ const Router = Express.Router();
 
 Mongoose.Promise = Promise;
 
+export const AlphapointError = {
+  AlphapointAuth: 'Alphapoint Auth',
+  AlphapointChangeVerificationLevel: 'Alphapoint Change Verification Level'
+}
+
 Router
   .post('/', validateMessageBody, (req, res) => {
     /*!
@@ -113,7 +118,7 @@ Router
                  * If login was not successfull return error
                  */
 
-                return Promise.reject({ message: 'Alphapoint Auth' });
+                return Promise.reject({ message: AlphapointError.AlphapointAuth });
               })
               .then((data) => {
                 /*!
@@ -147,7 +152,7 @@ Router
                  * If could not change verification level return error
                  */
 
-                return Promise.reject({ message: 'Alphapoint Change VerificationLevel' });
+                return Promise.reject({ message: AlphapointError.AlphapointChangeVerificationLevel });
               })
               .catch((err) => {
                 let clientStatus;
@@ -157,12 +162,12 @@ Router
                  */
 
                 switch (err.message) {
-                  case 'Alphapoint Auth':
+                  case AlphapointError.AlphapointAuth:
                     Datadog.report('verify_message', 'alphapoint_auth');
                     clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
                     break;
 
-                  case 'Alphapoint Change VerificationLevel':
+                  case AlphapointError.AlphapointChangeVerificationLevel:
                     Datadog.report('verify_message', 'alphapoint_change_verification_level');
                     clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
                     break;
