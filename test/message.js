@@ -1,5 +1,3 @@
-'use strict';
-
 const Request = require('supertest');
 const HttpStatus = require('http-status');
 const Expect = require('chai').expect;

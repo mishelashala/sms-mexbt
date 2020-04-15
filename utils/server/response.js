@@ -1,5 +1,3 @@
-'use strict';
-
 const HttpStatus = require('http-status');
 
 const create = (http) => {

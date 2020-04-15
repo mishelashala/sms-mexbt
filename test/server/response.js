@@ -1,5 +1,3 @@
-'use strict';
-
 const Expect = require('chai').expect;
 const HttpStatus = require('http-status');
 const ServerResponse = require('../../utils/server/response');

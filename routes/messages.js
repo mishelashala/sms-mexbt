@@ -1,5 +1,3 @@
-'use strict';
-
 const Express = require('express');
 const HttpStatus = require('http-status');
 const Twilio = require('twilio');

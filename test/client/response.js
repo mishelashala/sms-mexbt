@@ -1,5 +1,3 @@
-'use strict';
-
 const Expect = require('chai').expect;
 const ClientResponse = require('../../utils/client/response');
 const ClientStatus = require('../../utils/client/status');

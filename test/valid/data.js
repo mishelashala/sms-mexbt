@@ -1,5 +1,3 @@
-'use strict';
-
 const Expect = require('chai').expect;
 
 const keys = require('../../keys');

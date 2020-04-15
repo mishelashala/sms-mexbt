@@ -1,5 +1,3 @@
-'use strict';
-
 const HttpStatus = require('http-status');
 const ClientResponse = require('../client/response');
 const ServerResponse = require('../server/response');

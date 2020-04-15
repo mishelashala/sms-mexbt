@@ -1,5 +1,3 @@
-'use strict';
-
 // Successful
 const MESSAGE_SENT = 10;
 const USER_VERIFIED = 11;

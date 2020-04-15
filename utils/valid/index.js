@@ -1,5 +1,3 @@
-'use strict';
-
 const message = (data) => {
   if (data.phone === undefined) {
     return false;

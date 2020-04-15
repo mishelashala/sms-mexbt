@@ -1,5 +1,3 @@
-'use strict';
-
 const ClientStatus = require('./status');
 
 const create = (status) => {

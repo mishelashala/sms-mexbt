@@ -1,5 +1,3 @@
-'use strict';
-
 const Statsd = require('node-dogstatsd').StatsD;
 const datadog = new Statsd('localhost', 8125);
 

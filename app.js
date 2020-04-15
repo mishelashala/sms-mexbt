@@ -1,5 +1,3 @@
-'use strict';
-
 const Express = require('express');
 const BodyParser = require('body-parser');
 const HttpStatus = require('http-status');
@@ -33,7 +31,7 @@ app.use('/api/verify', verifyRoute);
  * If the route is not defined in the routers,
  * this middleware will be called
  */
-app.use((req, res) => {
+app.use((_req, res) => {
   res
     .status(HttpStatus.NOT_FOUND)
     .json(Response.create({ http: HttpStatus.NOT_FOUND }));
