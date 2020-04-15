@@ -3,18 +3,18 @@ const HttpStatus = require('http-status');
 const Axios = require('axios');
 const Mongoose = require('mongoose');
 
-const Valid = require('../utils/valid');
 const User = require('../databases/').models.user;
 const Response = require('../utils/response');
 const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
+const { validateMessageBody } = require('../middlewares/validation')
 
 const Router = Express.Router();
 
 Mongoose.Promise = Promise;
 
 Router
-  .post('/', (req, res) => {
+  .post('/', validateMessageBody, (req, res) => {
     /*!
      * Content negotiation (REST)
      */
@@ -26,19 +26,6 @@ Router
          */
 
         const data = req.body;
-
-        if (!Valid.verification(data)) {
-          Datadog.report('verify_message', 'invalid_user_input');
-
-          const responseObject = Response.create({
-            http: HttpStatus.BAD_REQUEST,
-            client: ClientStatus.INVALID_USER_INPUT
-          });
-
-          return res
-            .status(HttpStatus.BAD_REQUEST)
-            .json(responseObject);
-        }
 
         /*!
          * Search one user in the database using the email as query
