@@ -1,8 +1,13 @@
-const env = process.env;
+const { env } = process;
 let config;
 
+const EnvName = {
+  Production: 'production',
+  Staging: 'staging',
+}
+
 switch (env.NODE_ENV) {
-  case 'production':
+  case EnvName.Production:
     config = {
       account_sid: env.TWILIO_ACCOUNT_SID,
       auth_token: env.TWILIO_AUTH_TOKEN,
@@ -16,7 +21,7 @@ switch (env.NODE_ENV) {
     };
     break;
 
-  case 'staging':
+  case EnvName.Staging:
     config = {
       account_sid: env.TWILIO_ACCOUNT_SID,
       auth_token: env.TWILIO_AUTH_TOKEN,
