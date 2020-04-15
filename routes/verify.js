@@ -52,19 +52,6 @@ Router
 
           const _user = await UserService.findOneByEmailAndCode({ email: data.email, code: data.code })
 
-          if (_user.verified) {
-            Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserAlreadyVerified);
-
-            const responseObject = Response.create({
-              http: HttpStatus.BAD_REQUEST,
-              client: ClientStatus.USER_ALREADY_VERIFIED
-            });
-
-            return res
-              .status(HttpStatus.BAD_REQUEST)
-              .json(responseObject);
-          }
-
           /*!
            * Change user verified status and the updated at property
            * then save the changes in the database.
@@ -74,12 +61,6 @@ Router
           _user.updated_at = Date.now();
 
           await _user.save()
-
-          /*!
-           * Report to datadog
-           */
-
-          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
 
           /*!
            * Auth Attempt To Alphapoint
@@ -110,7 +91,13 @@ Router
           }
 
           /*!
-           * If verification level changed respond 202 Accepted
+           * Report to datadog
+           */
+
+          Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
+
+          /*!
+           * If everything went fine respond with 202 Accepted
            */
 
           const responseObject = Response.create({
@@ -149,9 +136,15 @@ Router
               http = HttpStatus.INTERNAL_SERVER_ERROR
               break;
 
-            case UserServiceError.UserNotFound:
+            case UserServiceError.NotFound:
               Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
               clientStatus = ClientStatus.USER_NOT_FOUND
+              http = HttpStatus.BAD_REQUEST
+              break
+
+            case UserServiceError.AlreadyVerified:
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserAlreadyVerified);
+              clientStatus = ClientStatus.USER_ALREADY_VERIFIED
               http = HttpStatus.BAD_REQUEST
               break
 
