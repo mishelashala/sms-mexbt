@@ -14,8 +14,27 @@ const Router = Express.Router();
 Mongoose.Promise = Promise;
 
 export const AlphapointError = {
-  AlphapointAuth: 'Alphapoint Auth',
-  AlphapointChangeVerificationLevel: 'Alphapoint Change Verification Level'
+  Auth: 'Alphapoint Auth',
+  ChangeVerificationLevel: 'Alphapoint Change Verification Level'
+}
+
+export const LogType = {
+  VerifyMessage: 'verify_message',
+}
+
+export const LogVerifyMessageType = {
+  AlphapointAuth: 'alphapoint_auth',
+  BadContentNegotiation: 'bad_content_negotiation',
+  DatabaseConnectionError: 'error_database_connection',
+  InvalidUserEmail: 'invalid_user_email',
+  InvalidUserCode: 'invalid_user_code',
+  MethodNotAllowed: 'method_not_allowed',
+  UserAlreadyVerified: 'user_already_verified',
+  UserVerified: 'user_verified'
+}
+
+const UserVerificationServiceError = {
+  CouldNotVerify: 'error_database_verifying_user'
 }
 
 Router
@@ -41,7 +60,7 @@ Router
           .exec()
           .then((_user) => {
             if (!_user) {
-              Datadog.report('verify_message', 'invalid_user_email');
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserEmail);
 
               const responseObject = Response.create({
                 http: HttpStatus.BAD_REQUEST,
@@ -54,7 +73,7 @@ Router
             }
 
             if (_user.code !== data.code) {
-              Datadog.report('verify_message', 'invalid_user_code');
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.InvalidUserCode);
 
               const responseObject = Response.create({
                 http: HttpStatus.BAD_REQUEST,
@@ -67,7 +86,7 @@ Router
             }
 
             if (_user.verified === true) {
-              Datadog.report('verify_message', 'user_already_verified');
+              Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserAlreadyVerified);
 
               const responseObject = Response.create({
                 http: HttpStatus.BAD_REQUEST,
@@ -94,7 +113,7 @@ Router
                  * Report to datadog
                  */
 
-                Datadog.report('verify_message', 'user_verified');
+                Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.UserVerified);
 
                 /*!
                  * Auth Attempt To Alphapoint
@@ -118,7 +137,7 @@ Router
                  * If login was not successfull return error
                  */
 
-                return Promise.reject({ message: AlphapointError.AlphapointAuth });
+                return Promise.reject({ message: AlphapointError.Auth });
               })
               .then((data) => {
                 /*!
@@ -152,7 +171,7 @@ Router
                  * If could not change verification level return error
                  */
 
-                return Promise.reject({ message: AlphapointError.AlphapointChangeVerificationLevel });
+                return Promise.reject({ message: AlphapointError.ChangeVerificationLevel });
               })
               .catch((err) => {
                 let clientStatus;
@@ -162,18 +181,18 @@ Router
                  */
 
                 switch (err.message) {
-                  case AlphapointError.AlphapointAuth:
-                    Datadog.report('verify_message', 'alphapoint_auth');
+                  case AlphapointError.Auth:
+                    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.AlphapointAuth);
                     clientStatus = ClientStatus.ALPHAPOINT_CANNOT_AUTH;
                     break;
 
-                  case AlphapointError.AlphapointChangeVerificationLevel:
-                    Datadog.report('verify_message', 'alphapoint_change_verification_level');
+                  case AlphapointError.ChangeVerificationLevel:
+                    Datadog.report(LogType.VerifyMessage, AlphapointError.ChangeVerificationLevel);
                     clientStatus = ClientStatus.CANNOT_CHANGE_VERIFICATION_LEVEL;
                     break;
 
                   default:
-                    Datadog.report('verify_message', 'error_database_verifying_user');
+                    Datadog.report(LogType.VerifyMessage, UserVerificationServiceError.CouldNotVerify);
                     clientStatus = ClientStatus.DATABASE_CONNECTION_FAILED;
                     break;
                 }
@@ -189,7 +208,7 @@ Router
               });
           })
           .catch(() => {
-            Datadog.report('verify_message', 'error_database_connection');
+            Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.DatabaseConnectionError);
 
             const responseObject = Response.create({
               http: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -208,7 +227,7 @@ Router
        */
 
       default () {
-        Datadog.report('verify_message', 'bad_content_negotiation');
+        Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.BadContentNegotiation);
 
         const responseObject = Response.create({
           http: HttpStatus.NOT_ACCEPTABLE
@@ -226,7 +245,7 @@ Router
    */
 
   .get('/', (req, res) => {
-    Datadog.report('verify_message', 'method_not_allowed');
+    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.MethodNotAllowed);
 
     const responseObject = Response.create({
       http: HttpStatus.METHOD_NOT_ALLOWED
@@ -238,7 +257,7 @@ Router
   })
 
   .put('/', (req, res) => {
-    Datadog.report('verify_message', 'method_not_allowed');
+    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.MethodNotAllowed);
 
     const responseObject = Response.create({
       http: HttpStatus.METHOD_NOT_ALLOWED
@@ -250,7 +269,7 @@ Router
   })
 
   .delete('/', (req, res) => {
-    Datadog.report('verify_message', 'method_not_allowed');
+    Datadog.report(LogType.VerifyMessage, LogVerifyMessageType.MethodNotAllowed);
 
     const responseObject = Response.create({
       http: HttpStatus.METHOD_NOT_ALLOWED
