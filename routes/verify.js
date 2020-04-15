@@ -4,10 +4,11 @@ const Axios = require('axios');
 const Mongoose = require('mongoose');
 
 const User = require('../databases/').models.user;
-const Response = require('../utils/response');
+const { validateMessageBody } = require('../middlewares/validation')
+const AlphapointService = require('../services/AlphaPointSerice')
 const ClientStatus = require('../utils/client/status');
 const Datadog = require('../utils/datadog');
-const { validateMessageBody } = require('../middlewares/validation')
+const Response = require('../utils/response');
 
 const Router = Express.Router();
 
@@ -119,59 +120,47 @@ Router
                  * Auth Attempt To Alphapoint
                  */
 
-                return Axios.post('https://sim.mexbt.com:8451/ajax/v1/Login', {
-                  'adminUserId': 'william',
-                  'password': 'william123'
-                });
+                return AlphapointService.auth()
               })
               .then((response) => {
-                /*!
-                 * If login was successfull return response
-                 */
-
-                if (response.data.isAccepted === true) {
-                  return response.data;
-                }
-
-                /*!
+                 /*!
                  * If login was not successfull return error
                  */
+                if (!response.data.isAccepted) {
+                  return Promise.reject({ message: AlphapointError.Auth });
+                }
 
-                return Promise.reject({ message: AlphapointError.Auth });
+                return response.data;
               })
               .then((data) => {
                 /*!
-                 * Attempt to Change user verification level
+                 * Attempt to change user verification level
                  */
 
-                return Axios.post('https://sim.mexbt.com:8451/ajax/v1/SetUserVerificationLevel', {
-                  sessionToken: data.sessionToken,
-                  UserId: _user.email,
-                  VerificationLevel: '3'
-                });
+                return AlphapointService.verifyUser({ token: data.sessionToken, email: _user.email })
               })
               .then((response) => {
-                /*!
-                 * If verification level changed respond 202 Accepted
-                 */
-
-                if (response.data.isAccepted === true) {
-                  const responseObject = Response.create({
-                    http: HttpStatus.ACCEPTED,
-                    client: ClientStatus.USER_VERIFIED,
-                    data: _user
-                  });
-
-                  return res
-                    .status(HttpStatus.ACCEPTED)
-                    .json(responseObject);
-                }
-
                 /*!
                  * If could not change verification level return error
                  */
 
-                return Promise.reject({ message: AlphapointError.ChangeVerificationLevel });
+                if (!response.data.isAccepted) {
+                  return Promise.reject({ message: AlphapointError.ChangeVerificationLevel });
+                }
+
+                /*!
+                 * If verification level changed respond 202 Accepted
+                 */
+
+                const responseObject = Response.create({
+                  http: HttpStatus.ACCEPTED,
+                  client: ClientStatus.USER_VERIFIED,
+                  data: _user
+                });
+
+                return res
+                  .status(HttpStatus.ACCEPTED)
+                  .json(responseObject);
               })
               .catch((err) => {
                 let clientStatus;
