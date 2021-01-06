@@ -25,7 +25,7 @@
     "http-status": "0.2.2",
     "istanbul": "0.4.3",
     "mocha": "2.4.5",
-    "mongoose": "4.4.17",
+    "mongoose": "5.7.5",
     "node-dogstatsd": "0.0.6",
     "semistandard": "8.0.0",
     "supertest": "1.2.0",
